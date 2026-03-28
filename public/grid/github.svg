@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#101010"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <circle cx="800" cy="420" r="220" fill="#181818" stroke="#2f2f2f" stroke-width="14"/>
+  <circle cx="725" cy="380" r="24" fill="#6b6b6b"/>
+  <circle cx="875" cy="380" r="24" fill="#6b6b6b"/>
+  <path d="M700 520c45 35 155 35 200 0" fill="none" stroke="#6b6b6b" stroke-width="18" stroke-linecap="round"/>
+  <text x="110" y="860" fill="#f5f5f5" font-size="96" font-family="Inter, Arial, sans-serif">GitHub</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141414"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect x="250" y="200" width="1100" height="600" rx="36" fill="#111111" stroke="#2c2c2c"/>
+  <rect x="380" y="330" width="90" height="290" rx="20" fill="#5b5b5b"/>
+  <circle cx="425" cy="250" r="48" fill="#7c7c7c"/>
+  <path d="M620 620V360h85v36c30-28 74-50 140-50 135 0 205 84 205 230v44h-95v-56c0-76-27-121-95-121-61 0-97 41-97 121v56h-143Z" fill="#6a6a6a"/>
+  <text x="110" y="860" fill="#f5f5f5" font-size="96" font-family="Inter, Arial, sans-serif">LinkedIn</text>
+</svg>
