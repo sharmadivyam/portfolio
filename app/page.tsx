@@ -8,12 +8,12 @@ import {
   Wrench,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LayoutGrid } from "@/components/ui/layout-grid";
+import { SiteHeader } from "@/components/site-header";
 import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 
 export default function Home() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [showSubheading, setShowSubheading] = useState(false);
   const projects = [
     {
@@ -79,7 +79,7 @@ export default function Home() {
     },
     {
       id: 3,
-      content: "Blog",
+      content: "Resume",
       className: "md:col-span-1",
       thumbnail: "/grid/blog.svg",
     },
@@ -118,54 +118,9 @@ export default function Home() {
     { text: "systems" },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <main className="min-h-screen bg-black px-4 pt-16 text-white sm:px-6 sm:pt-20">
-      <header
-        className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ease-in-out ${
-          isScrolled
-            ? "border-b border-white/10 bg-black/60 shadow-[0_10px_28px_rgba(0,0,0,0.22)] backdrop-blur-lg"
-            : "bg-black/20 backdrop-blur-md"
-        }`}
-      >
-        <div
-          className={`mx-auto flex w-full flex-col items-start gap-4 px-5 text-sm text-white/72 transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-10 ${
-            isScrolled
-              ? "max-w-[72rem] py-3"
-              : "max-w-5xl py-5"
-          }`}
-        >
-          <span className="text-[11px] tracking-[0.32em] uppercase text-white/55">
-            Portfolio
-          </span>
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-8">
-            <a className="transition-opacity hover:opacity-70" href="#about">
-              About
-            </a>
-            <a className="transition-opacity hover:opacity-70" href="#resume">
-              Resume
-            </a>
-            <a className="transition-opacity hover:opacity-70" href="#work">
-              Projects
-            </a>
-            <a className="transition-opacity hover:opacity-70" href="#contact">
-              Contact
-            </a>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader activePage="home" />
 
       <div className="mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-5xl flex-col">
         <section className="flex min-h-screen items-center py-16 sm:py-24">
