@@ -32,14 +32,14 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
 
   return (
     <div className="relative w-full">
-      <div className="grid auto-rows-[220px] grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid auto-rows-[180px] grid-cols-1 gap-4 md:grid-cols-3">
         {cards.map((card) => (
           <button
             key={card.id}
             type="button"
             onClick={() => setSelectedId(card.id)}
             className={cn(
-              "group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/20",
+              "group relative overflow-hidden rounded-2xl border border-[#E8DDD7] bg-[#FFF9F6] text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[#B85A2E]",
               card.className,
             )}
           >
@@ -47,12 +47,12 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
               src={card.thumbnail}
               alt={typeof card.content === "string" ? card.content : "Grid card"}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition duration-200 ease-out"
               sizes="(max-width: 767px) 100vw, 33vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-[#24272C] opacity-45 transition duration-200 ease-out group-hover:opacity-25" />
             <div className="absolute inset-x-0 bottom-0 p-5">
-              <p className="text-base font-medium text-white sm:text-lg">
+              <p className="text-base font-medium text-[#FFF9F6] sm:text-lg">
                 {card.content}
               </p>
             </div>
@@ -61,17 +61,17 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
       </div>
 
       {selectedCard ? (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-3xl bg-black/60 p-2 backdrop-blur-sm sm:p-4">
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-3xl bg-[#F7F2EF] p-2 sm:p-4">
           <button
             type="button"
             aria-label="Close expanded card"
             onClick={() => setSelectedId(null)}
-            className="absolute top-5 right-5 z-30 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs text-white/80 transition-opacity hover:opacity-70"
+            className="absolute top-5 right-5 z-30 rounded-full border border-[#E8DDD7] bg-[#FFF9F6] px-3 py-1 text-xs text-[#5F5A56] transition duration-200 ease-out hover:border-[#B85A2E] hover:text-[#B85A2E]"
           >
             Close
           </button>
 
-          <div className="relative h-full min-h-[28rem] w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-950 shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
+          <div className="relative h-full min-h-[28rem] w-full overflow-hidden rounded-3xl border border-[#E8DDD7] bg-[#FFF9F6]">
             <Image
               src={selectedCard.thumbnail}
               alt={
@@ -83,9 +83,9 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
               className="object-cover"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/15" />
+            <div className="absolute inset-0 bg-[#24272C] opacity-65" />
             <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-              <p className="text-2xl font-medium text-white sm:text-4xl">
+              <p className="text-2xl font-medium text-[#FFF9F6] sm:text-4xl">
                 {selectedCard.content}
               </p>
 
@@ -95,7 +95,7 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
                     href={selectedCard.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white transition-all duration-300 hover:bg-white/15"
+                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#FFF9F6] bg-transparent px-4 py-2 text-sm text-[#FFF9F6] transition duration-200 ease-out hover:bg-[#FFF9F6] hover:text-[#292B30]"
                   >
                     Open
                     <ExternalLink className="h-4 w-4" />
@@ -103,7 +103,7 @@ export function LayoutGrid({ cards }: LayoutGridProps) {
                 ) : (
                   <Link
                     href={selectedCard.href}
-                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white transition-all duration-300 hover:bg-white/15"
+                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#FFF9F6] bg-transparent px-4 py-2 text-sm text-[#FFF9F6] transition duration-200 ease-out hover:bg-[#FFF9F6] hover:text-[#292B30]"
                   >
                     Open
                   </Link>

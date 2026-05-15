@@ -1,14 +1,27 @@
 "use client";
 
+import { ArrowRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type SiteHeaderProps = {
-  activePage?: "home" | "about" | "work";
+  activePage?: "home" | "about" | "work" | "contact";
 };
+
+const navItems: Array<{
+  label: string;
+  href: string;
+  page: NonNullable<SiteHeaderProps["activePage"]>;
+}> = [
+  { label: "Home", href: "/", page: "home" },
+  { label: "About", href: "/about", page: "about" },
+  { label: "Work", href: "/work", page: "work" },
+  { label: "Contact", href: "/contact", page: "contact" },
+];
 
 export function SiteHeader({ activePage = "home" }: SiteHeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,40 +37,68 @@ export function SiteHeader({ activePage = "home" }: SiteHeaderProps) {
   }, []);
 
   const linkClassName = (isActive: boolean) =>
-    `transition-opacity hover:opacity-70 ${isActive ? "text-white" : ""}`;
+    `text-[15px] font-medium text-[#292B30] underline-offset-4 transition duration-200 ease-out hover:text-[#B85A2E] sm:text-base ${
+      isActive ? "text-[#B85A2E] underline" : ""
+    }`;
 
   return (
     <header
-      className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ease-in-out ${
-        isScrolled
-          ? "border-b border-white/10 bg-black/60 shadow-[0_10px_28px_rgba(0,0,0,0.22)] backdrop-blur-lg"
-          : "bg-black/20 backdrop-blur-md"
-      }`}
+      className="fixed top-0 left-0 z-50 w-full border-b border-[#E8DDD7] bg-[#F5F1EC]/95 backdrop-blur-sm transition duration-200 ease-out"
     >
       <div
-        className={`mx-auto flex w-full flex-col items-start gap-4 px-5 text-sm text-white/72 transition-all duration-300 ease-in-out sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-10 ${
-          isScrolled ? "max-w-[72rem] py-3" : "max-w-5xl py-5"
+        className={`mx-auto flex min-h-16 w-full flex-row items-center justify-between gap-4 px-6 text-sm text-[#292B30] transition duration-200 ease-out sm:px-8 md:min-h-[72px] md:gap-6 lg:px-10 ${
+          isScrolled ? "max-w-[72rem] py-3" : "max-w-6xl py-4"
         }`}
       >
-        <span className="text-[11px] tracking-[0.32em] uppercase text-white/55">
-          Portfolio
+        <span className="text-[11px] tracking-[0.32em] uppercase text-[#292B30] sm:text-xs sm:tracking-[0.28em]">
+          Divyam Sharma
         </span>
 
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-8">
-          <Link className={linkClassName(activePage === "home")} href="/">
-            Home
-          </Link>
-          <Link className={linkClassName(activePage === "about")} href="/about">
-            About
-          </Link>
-          <Link className={linkClassName(activePage === "work")} href="/work">
-            Work
-          </Link>
-          <Link className={linkClassName(false)} href="/#contact">
-            Contact
-          </Link>
+        <nav className="hidden flex-wrap items-center gap-x-6 gap-y-2 md:flex md:gap-x-8">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              className={linkClassName(activePage === item.page)}
+              href={item.href}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
+
+        <button
+          type="button"
+          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen((current) => !current)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-[#292B30] transition duration-200 ease-out hover:bg-[#E8DDD7]/60 md:hidden"
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
+
+      <nav
+        aria-label="Mobile navigation"
+        className={`border-t border-[#E8DDD7] bg-[#F5F1EC]/98 px-6 py-3 shadow-[0_16px_30px_rgba(36,39,44,0.08)] backdrop-blur-sm transition duration-200 ease-out md:hidden ${
+          isMenuOpen ? "block" : "hidden"
+        }`}
+      >
+        <div className="mx-auto flex max-w-6xl flex-col">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setIsMenuOpen(false)}
+              className={`group flex items-center justify-between border-b border-[#E8DDD7]/70 py-3 text-sm font-medium transition duration-200 ease-out last:border-b-0 hover:text-[#B85A2E] ${
+                activePage === item.page ? "text-[#B85A2E]" : "text-[#292B30]"
+              }`}
+            >
+              <span>{item.label}</span>
+              <ArrowRight className="h-4 w-4 text-current transition duration-200 ease-out group-hover:translate-x-1" />
+            </Link>
+          ))}
+        </div>
+      </nav>
     </header>
   );
 }

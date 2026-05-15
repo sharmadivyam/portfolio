@@ -1,31 +1,19 @@
-import { Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { ProjectCard } from "@/components/project-card";
-import { LayoutGrid } from "@/components/ui/layout-grid";
-import { contactCards } from "@/data/contact-cards";
 import { projects } from "@/data/projects";
-
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  style: ["italic", "normal"],
-  weight: ["400"],
-  display: "swap",
-});
 
 export default function WorkPage() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-[#F7F2EF] text-[#292B30]">
       <SiteHeader activePage="work" />
 
-      <section className="w-full py-20 pt-22 sm:pt-24">
+      <section className="w-full border-b border-[#E8DDD7] py-24 pt-28 sm:pt-32">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <h1
-            className={`${playfairDisplay.className} mb-4 text-5xl font-normal italic text-neutral-300 md:text-6xl`}
-          >
+          <h1 className="mb-4 text-6xl font-bold leading-[0.9] tracking-tight text-[#292B30] md:text-8xl">
             Work
           </h1>
 
-          <p className="max-w-2xl text-base leading-7 text-zinc-400">
+          <p className="max-w-2xl text-base leading-7 text-[#5F5A56]">
             Selected projects across AI systems, product experimentation, and
             data-driven engineering.
           </p>
@@ -46,11 +34,6 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section id="contact" className="w-full py-20">
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <LayoutGrid cards={contactCards} />
-        </div>
-      </section>
     </main>
   );
 }

@@ -15,7 +15,7 @@ export function ProjectDetailContent({
 }: ProjectDetailContentProps) {
   return (
     <motion.main
-      className="min-h-screen bg-black text-white"
+      className="min-h-screen bg-[#F7F2EF] text-[#292B30]"
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
@@ -24,37 +24,37 @@ export function ProjectDetailContent({
         <div className="mx-auto max-w-5xl">
           <Link
             href="/work"
-            className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors duration-300 hover:text-white"
+            className="inline-flex items-center gap-2 text-sm text-[#5F5A56] underline-offset-4 transition duration-200 ease-out hover:text-[#B85A2E] hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Projects
           </Link>
 
           <div className="mt-8">
-            <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            <h1 className="max-w-4xl text-5xl font-bold leading-[0.95] tracking-tight text-[#292B30] sm:text-7xl">
               {project.title}
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-400 sm:text-lg">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-[#5F5A56] sm:text-lg">
               {project.description}
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-zinc-300">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2">
-                <CalendarDays className="h-4 w-4 text-zinc-500" />
+            <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-[#5F5A56]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8DDD7] bg-transparent px-4 py-2">
+                <CalendarDays className="h-4 w-4" />
                 <span>{project.date}</span>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2">
-                <BriefcaseBusiness className="h-4 w-4 text-zinc-500" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8DDD7] bg-transparent px-4 py-2">
+                <BriefcaseBusiness className="h-4 w-4" />
                 <span>{project.role}</span>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 px-4 py-2">
-                <Layers3 className="h-4 w-4 text-zinc-500" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8DDD7] bg-transparent px-4 py-2">
+                <Layers3 className="h-4 w-4" />
                 <span>{project.techStack.join(" · ")}</span>
               </div>
             </div>
           </div>
 
-          <div className="relative mt-12 overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
+          <div className="relative mt-12 overflow-hidden rounded-xl border border-[#E8DDD7] bg-[#FFF9F6]">
             <Image
               src={project.image}
               alt={project.title}
@@ -66,7 +66,7 @@ export function ProjectDetailContent({
           </div>
 
           <article className="mx-auto mt-16 max-w-3xl">
-            <div className="prose prose-invert prose-zinc max-w-none prose-headings:mt-10 prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-relaxed prose-a:text-zinc-200 prose-a:underline-offset-4 hover:prose-a:text-white prose-strong:text-white prose-li:text-zinc-300 prose-pre:rounded-2xl prose-pre:border prose-pre:border-white/10 prose-pre:bg-zinc-950">
+            <div className="prose max-w-none prose-headings:mt-10 prose-headings:font-semibold prose-headings:leading-[0.98] prose-headings:tracking-tight prose-headings:text-[#292B30] prose-p:leading-relaxed prose-p:text-[#5F5A56] prose-a:text-[#B85A2E] prose-a:underline-offset-4 hover:prose-a:text-[#B85A2E] prose-strong:text-[#292B30] prose-li:text-[#5F5A56] prose-pre:rounded-2xl prose-pre:border prose-pre:border-[#E8DDD7] prose-pre:bg-[#FFF9F6]">
               {project.sections.map((section) => (
                 <section key={section.title}>
                   <h2>{section.title}</h2>
@@ -92,10 +92,10 @@ export function ProjectDetailContent({
             </div>
           </article>
 
-          <div className="mx-auto mt-16 max-w-3xl border-t border-white/10 pt-8">
+          <div className="mx-auto mt-16 max-w-3xl border-t border-[#E8DDD7] pt-8">
             <Link
               href="/work"
-              className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors duration-300 hover:text-white"
+              className="inline-flex items-center gap-2 text-sm text-[#5F5A56] underline-offset-4 transition duration-200 ease-out hover:text-[#B85A2E] hover:underline"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Projects

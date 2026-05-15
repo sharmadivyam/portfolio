@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRight,
   BrainCircuit,
   Code2,
   Database,
@@ -15,6 +16,7 @@ import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 
 export default function Home() {
   const [showSubheading, setShowSubheading] = useState(false);
+  const [showMobileSubheading, setShowMobileSubheading] = useState(false);
   const projects = [
     {
       title: "Project 1",
@@ -107,95 +109,176 @@ export default function Home() {
       external: true,
     },
   ];
-  const headingWords = [{ text: "Hi," }, { text: "I’m" }, { text: "Divyam" }];
-  const subheadingWords = [
-    { text: "I" },
-    { text: "build" },
-    { text: "and" },
-    { text: "experiment" },
-    { text: "with" },
-    { text: "AI" },
-    { text: "systems" },
+  const headingWords = [
+    { text: "Hi," },
+    { text: "I'm" },
+    {
+      text: "Divyam",
+    },
   ];
+  const subheadingWords = [
+    { text: "Building" },
+    { text: "AI" },
+    { text: "systems." },
+    { text: "From" },
+    { text: "idea" },
+    { text: "to" },
+    { text: "production.", className: "text-[#B85A2E]" },
+  ];
+  const primaryButtonClassName =
+    "inline-flex min-h-12 items-center justify-center rounded-md border border-[#24272C] bg-[#24272C] px-6 py-3 text-sm font-semibold text-[#FFF9F6] shadow-[0_10px_30px_rgba(36,39,44,0.12)] transition duration-200 ease-out hover:border-[#B85A2E] hover:bg-[#B85A2E]";
+  const secondaryButtonClassName =
+    "inline-flex min-h-12 items-center justify-center rounded-md border border-[#D7C9C1] bg-transparent px-6 py-3 text-sm font-medium text-[#292B30] transition duration-200 ease-out hover:border-[#B85A2E] hover:text-[#B85A2E]";
 
   return (
-    <main className="min-h-screen bg-black px-4 pt-16 text-white sm:px-6 sm:pt-20">
+    <main className="min-h-screen bg-[#F5F1EC] px-4 pt-24 text-[#292B30] sm:px-6 sm:pt-28 max-md:px-2 max-md:pt-20">
       <SiteHeader activePage="home" />
 
-      <div className="mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-5xl flex-col">
-        <section className="flex min-h-screen items-center py-16 sm:py-24">
-          <div className="flex w-full flex-col items-center justify-between gap-12 text-center lg:flex-row lg:items-center lg:gap-16 lg:text-left">
-            <div className="flex w-full justify-center lg:-ml-8 lg:w-auto lg:flex-none lg:justify-start">
-              <div className="relative h-[350px] w-[350px] sm:h-[420px] sm:w-[420px] lg:w-[450px]">
-                <Image
-                  src="/divyam.png"
-                  alt="Divyam Sharma"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 639px) 350px, (max-width: 1023px) 420px, 450px"
-                  priority
+      <div className="mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-6xl flex-col max-md:min-h-0">
+        <section className="flex min-h-[calc(100vh-7rem)] items-center border-b border-[#E8DDD7] py-20 sm:py-24 lg:py-28 max-md:min-h-0 max-md:border-b-0 max-md:py-0">
+          <div className="flex w-full flex-col justify-between gap-12 lg:flex-row lg:items-center lg:gap-[60px] max-md:p-0">
+            <div className="w-full lg:max-w-none lg:flex-[0_1_60%] max-md:hidden">
+              <div className="flex max-w-[520px] flex-col items-center text-center lg:items-start lg:text-left max-md:max-w-none max-md:items-start max-md:text-left">
+                <TypewriterEffect
+                  words={headingWords}
+                  className="max-w-[12ch] text-5xl font-bold leading-[1.1] tracking-normal text-[#292B30] sm:max-w-none sm:text-[3.5rem] lg:text-[4rem] max-md:hidden"
+                  cursorClassName="bg-[#292B30]"
+                  typingSpeed={65}
+                  hideCursorOnComplete
+                  onComplete={() => {
+                    window.setTimeout(() => {
+                      setShowSubheading(true);
+                    }, 500);
+                  }}
                 />
+
+                <h1 className="hidden text-[2rem] font-bold leading-tight tracking-normal text-[#292B30] max-md:block">
+                  Hi, I&apos;m Divyam
+                </h1>
+
+                <div className="mt-4 min-h-[2rem] w-full max-w-[520px] sm:min-h-[2.5rem] max-md:hidden">
+                  {showSubheading ? (
+                    <TypewriterEffect
+                      words={subheadingWords}
+                      className="text-lg leading-[1.45] font-normal text-[#292B30] sm:text-[1.25rem]"
+                      cursorClassName="bg-[#B85A2E]"
+                      typingSpeed={50}
+                    />
+                  ) : null}
+                </div>
+
+                <p className="hidden text-sm leading-[1.5] text-[#292B30] max-md:mt-1.5 max-md:block">
+                  Building AI systems. From idea to{" "}
+                  <span className="text-[#B85A2E]">production.</span>
+                </p>
+
+                <p className="mt-5 max-w-[520px] text-base leading-[1.6] text-[#5F5A56] max-md:mt-3 max-md:text-sm max-md:leading-[1.55]">
+                  I work across machine learning and backend systems to build AI
+                  products that are reliable, scalable, and designed for real-world
+                  use.
+                </p>
+
+                <div className="mt-5 flex w-full flex-col gap-4 sm:flex-row sm:items-center max-md:mt-5 max-md:gap-3">
+                  <a
+                    href="#work"
+                    className={`${primaryButtonClassName} w-full sm:w-auto max-md:min-h-11 max-md:rounded-xl max-md:border-[#B85A2E] max-md:bg-[#B85A2E] max-md:px-4 max-md:py-3 max-md:text-xs max-md:shadow-[0_10px_24px_rgba(184,90,46,0.22)]`}
+                  >
+                    <span className="max-md:flex max-md:w-full max-md:items-center max-md:justify-center max-md:gap-12">
+                      Explore Projects
+                      <ArrowRight className="hidden h-3.5 w-3.5 max-md:block" />
+                    </span>
+                  </a>
+                  <a
+                    href="#contact"
+                    className={`${secondaryButtonClassName} w-full sm:w-auto max-md:min-h-11 max-md:rounded-xl max-md:px-4 max-md:py-3 max-md:text-xs`}
+                  >
+                    Contact
+                  </a>
+                </div>
+
+                <a
+                  href="#contact"
+                  className="mt-5 inline-flex text-sm text-[#5F5A56] underline-offset-4 transition duration-200 ease-out hover:text-[#B85A2E] hover:underline max-md:hidden"
+                >
+                  Want to build something cool &rarr;
+                </a>
               </div>
             </div>
 
-            <div className="w-full max-w-xl">
-              <TypewriterEffect
-                words={headingWords}
-                className="mt-4 max-w-[12ch] text-[2.7rem] font-bold leading-[0.92] tracking-[-0.055em] sm:mt-8 sm:max-w-none sm:text-7xl lg:mt-0 lg:text-[6.4rem]"
-                cursorClassName="bg-white/75"
-                typingSpeed={85}
-                hideCursorOnComplete
-                onComplete={() => {
-                  window.setTimeout(() => {
-                    setShowSubheading(true);
-                  }, 500);
-                }}
-              />
-
-              <div className="mt-6 min-h-[2.5rem] max-w-2xl sm:mt-8 sm:min-h-[4rem] sm:max-w-3xl">
-                {showSubheading ? (
-                  <TypewriterEffect
-                    words={subheadingWords}
-                    className="text-base leading-[1.5] font-normal text-zinc-300 sm:text-2xl"
-                    cursorClassName="bg-white/45"
-                    typingSpeed={65}
+            <div className="flex w-full justify-center lg:flex-[0_1_40%] lg:justify-end max-md:order-1">
+              <div className="w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[420px] max-md:max-w-none max-md:overflow-hidden max-md:rounded-2xl">
+                <div className="max-md:relative">
+                  <Image
+                    src="/divyam.png"
+                    alt="Divyam Sharma"
+                    width={420}
+                    height={420}
+                    preload
+                    className="h-auto w-full object-contain max-md:h-[340px] max-md:bg-[#FFF9F6] max-md:object-contain max-md:object-bottom"
+                    sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) min(80vw, 380px), 420px"
                   />
-                ) : null}
-              </div>
+                  <div className="absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-b from-transparent via-black/35 to-black max-md:block" />
+                </div>
 
-              <div className="mt-10 flex flex-col gap-4 sm:mt-12 sm:flex-row sm:items-center">
-                <a
-                  href="#work"
-                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition-opacity hover:opacity-85 sm:w-auto"
-                >
-                  Explore Projects
-                </a>
-                <a
-                  href="#contact"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-70 sm:w-auto"
-                >
-                  Contact
-                </a>
-              </div>
+                <div className="relative hidden -mt-px bg-[linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.96)_28%,#000_100%)] p-5 text-white max-md:block">
+                  <TypewriterEffect
+                    words={headingWords}
+                    className="text-[2rem] font-bold leading-tight tracking-normal text-white"
+                    cursorClassName="bg-white"
+                    typingSpeed={65}
+                    hideCursorOnComplete
+                    onComplete={() => {
+                      window.setTimeout(() => {
+                        setShowMobileSubheading(true);
+                      }, 350);
+                    }}
+                  />
 
-              <a
-                href="#contact"
-                className="mt-8 inline-flex text-sm text-white/55 transition hover:opacity-80 hover:underline"
-              >
-                Want to build something cool &rarr;
-              </a>
+                  <div className="mt-1.5 min-h-[1.35rem]">
+                    {showMobileSubheading ? (
+                      <TypewriterEffect
+                        words={subheadingWords}
+                        className="text-sm leading-[1.5] text-white"
+                        cursorClassName="bg-[#B85A2E]"
+                        typingSpeed={50}
+                      />
+                    ) : null}
+                  </div>
+
+                  <p className="mt-3 text-sm leading-[1.55] text-white/75">
+                    I work across machine learning and backend systems to build AI
+                    products that are reliable, scalable, and designed for
+                    real-world use.
+                  </p>
+
+                  <div className="mt-5 flex w-full flex-col gap-3">
+                    <a
+                      href="#work"
+                      className="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-white bg-white px-6 py-3 text-sm font-semibold text-[#292B30] shadow-[0_10px_24px_rgba(255,255,255,0.12)] transition duration-200 ease-out hover:border-[#B85A2E] hover:bg-[#B85A2E] hover:text-[#FFF9F6]"
+                    >
+                      Explore Projects
+                    </a>
+                    <a
+                      href="#contact"
+                      className="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-white/35 bg-transparent px-6 py-3 text-sm font-medium text-white transition duration-200 ease-out hover:border-[#B85A2E] hover:bg-[#B85A2E] hover:text-white"
+                    >
+                      Contact
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="about" className="w-full py-20">
+        <section id="about" className="w-full border-b border-[#E8DDD7] py-24">
           <div className="flex flex-col items-center justify-between gap-12 text-center lg:flex-row lg:items-center lg:text-left">
             <div className="w-full max-w-xl">
-              <h2 className="mb-4 text-sm font-medium tracking-[0.28em] text-neutral-500 uppercase md:mb-6">
+              <h2 className="mb-4 text-xs font-medium tracking-[0.32em] text-[#B85A2E] uppercase md:mb-6">
                 Myself
               </h2>
 
-              <div className="max-w-3xl space-y-6 text-left text-sm font-small leading-[1.5] tracking-tight text-neutral-300 antialiased md:space-y-8 md:text-xl lg:text-2xl">
+              <div className="max-w-3xl space-y-6 text-left text-sm leading-[1.55] text-[#5F5A56] antialiased md:space-y-8 md:text-xl lg:text-2xl">
                 <p>
                   I am a Computer Science undergraduate at Shiv Nadar
                   University, focused on building functional AI systems and
@@ -211,7 +294,7 @@ export default function Home() {
             </div>
 
             <div className="w-full max-w-xl">
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+              <div className="overflow-hidden rounded-2xl border border-[#E8DDD7] bg-[#FFF9F6]">
                 <video
                   src="/about-video.mp4"
                   autoPlay
@@ -225,9 +308,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="work" className="w-full py-20">
+        <section id="work" className="w-full border-b border-[#E8DDD7] py-24">
           <div className="w-full">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="text-4xl font-bold leading-[0.95] tracking-tight text-[#292B30] sm:text-5xl">
               Projects
             </h2>
 
@@ -236,7 +319,7 @@ export default function Home() {
                 <a
                   key={project.title}
                   href="#"
-                  className="group relative h-96 overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+                  className="group relative h-96 overflow-hidden rounded-2xl border border-[#E8DDD7] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[#B85A2E]"
                 >
                   <Image
                     src={project.image}
@@ -246,16 +329,16 @@ export default function Home() {
                     sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
                   />
 
-                  <div className="absolute inset-0 bg-black/10 transition-all duration-300 group-hover:bg-black/60" />
+                  <div className="absolute inset-0 bg-[#24272C] opacity-20 transition duration-200 ease-out group-hover:opacity-65" />
 
                   <div className="absolute right-0 bottom-0 left-0 p-6">
-                    <p className="text-xl font-semibold text-white">
+                    <p className="text-xl font-semibold text-[#FFF9F6]">
                       {project.title}
                     </p>
-                    <p className="mt-2 max-w-[28ch] text-sm leading-6 text-zinc-300">
+                    <p className="mt-2 max-w-[28ch] text-sm leading-6 text-[#FFF9F6]">
                       {project.description}
                     </p>
-                    <p className="mt-4 text-sm text-white/0 transition-all duration-300 group-hover:text-white/80">
+                    <p className="mt-4 text-sm text-[#FFF9F6] opacity-0 transition duration-200 ease-out group-hover:opacity-100">
                       View Project &rarr;
                     </p>
                   </div>
@@ -265,9 +348,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-20">
+        <section className="w-full border-b border-[#E8DDD7] py-24">
           <div className="w-full text-left">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="text-4xl font-bold leading-[0.95] tracking-tight text-[#292B30] sm:text-5xl">
               Skills
             </h2>
 
@@ -277,14 +360,16 @@ export default function Home() {
                   key={group.title}
                   className={index === 0 ? "" : "mt-8"}
                 >
-                  <p className="text-sm text-zinc-400">{group.title}</p>
+                  <p className="text-xs uppercase tracking-[0.28em] text-[#B85A2E]">
+                    {group.title}
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-3 sm:gap-4">
                     {group.skills.map((skill) => (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-neutral-800 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-neutral-700"
+                        className="inline-flex items-center gap-2 rounded-full border border-[#E8DDD7] bg-transparent px-4 py-2 text-xs font-medium text-[#5F5A56] transition duration-200 ease-out hover:border-[#B85A2E] hover:text-[#B85A2E]"
                       >
-                        <group.icon className="h-4 w-4 opacity-80" />
+                        <group.icon className="h-4 w-4" />
                         {skill}
                       </span>
                     ))}
@@ -295,9 +380,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className="w-full py-20">
-          <LayoutGrid cards={cards} />
-        </section>
       </div>
     </main>
   );

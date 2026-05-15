@@ -29,13 +29,13 @@ export function InfiniteMovingCards({
       {images.map((image, index) => (
         <div
           key={`${image.src}-${index}`}
-          className={`relative h-[280px] w-[220px] flex-none overflow-hidden rounded-lg ${cardClassName}`}
+          className={`relative h-[280px] w-[220px] flex-none overflow-hidden rounded-lg border border-[#E8DDD7] ${cardClassName}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image.src}
             alt={image.alt ?? `Gallery image ${index + 1}`}
-            className="h-full w-full rounded-lg object-cover transition duration-300 hover:scale-105"
+            className="h-full w-full rounded-lg object-cover transition duration-200 ease-out"
           />
         </div>
       ))}

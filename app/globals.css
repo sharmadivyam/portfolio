@@ -2,8 +2,14 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F5F1EC;
+  --foreground: #292B30;
+  --muted: #5F5A56;
+  --border: #E8DDD7;
+  --accent: #B85A2E;
+  --surface: #FCF8F4;
+  --button: #24272C;
+  --font-inter: Inter, Arial, Helvetica, sans-serif;
 }
 
 @theme inline {
@@ -12,17 +18,15 @@
   --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-inter);
+}
+
+html,
+body {
+  background-color: #F5F1EC;
 }
 
 @keyframes marquee-left {

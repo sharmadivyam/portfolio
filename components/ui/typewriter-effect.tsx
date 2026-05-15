@@ -112,7 +112,7 @@ function TypewriterBase({
         {showCursor ? (
           <span
             aria-hidden="true"
-            className={`ml-1 inline-block h-[1em] w-[2px] animate-pulse bg-white/80 align-middle ${
+            className={`ml-1 inline-block h-[1em] w-[2px] animate-pulse bg-[#292B30] align-middle ${
               cursorClassName ?? ""
             }`}
           />

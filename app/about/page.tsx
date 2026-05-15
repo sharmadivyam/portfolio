@@ -1,21 +1,11 @@
-import { Playfair_Display } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
-import { LayoutGrid } from "@/components/ui/layout-grid";
 import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
-import { contactCards } from "@/data/contact-cards";
 import aboutImage1 from "./1.jpg";
 import aboutImage2 from "./2.jpg";
 import aboutImage3 from "./3.jpg";
 import aboutImage4 from "./4.jpg";
 import aboutImage5 from "./5.jpg";
 import aboutImage6 from "./6.jpg";
-
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  style: ["italic", "normal"],
-  weight: ["400"],
-  display: "swap",
-});
 
 const galleryImages = [
   { src: aboutImage1.src, alt: "Portrait in warm light" },
@@ -30,30 +20,28 @@ const infoItems = [
   {
     label: "EXPERIENCE",
     value: "1+ years",
-    icon: "\u23f3",
+    icon: "01",
   },
   {
     label: "LOCATION",
     value: "Greater Noida",
-    icon: "\ud83d\udccd",
+    icon: "02",
   },
   {
     label: "FREELANCE",
     value: "Available",
-    icon: "\ud83d\udc4b",
+    icon: "03",
   },
 ];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-[#F7F2EF] text-[#292B30]">
       <SiteHeader activePage="about" />
 
-      <section className="w-full py-20 pt-28">
+      <section className="w-full border-b border-[#E8DDD7] py-24 pt-28">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <h1
-            className={`${playfairDisplay.className} mb-10 text-5xl font-normal italic text-neutral-300 md:text-6xl`}
-          >
+          <h1 className="mb-10 text-6xl font-bold leading-[0.9] tracking-tight text-[#292B30] md:text-8xl">
             About
           </h1>
 
@@ -64,7 +52,7 @@ export default function AboutPage() {
           />
 
           <div className="mt-14 max-w-6xl">
-            <h2 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            <h2 className="max-w-4xl text-4xl font-semibold leading-[0.98] tracking-tight text-[#292B30] sm:text-6xl">
               I&apos;m a designer, developer, & AI enthusiast.
             </h2>
 
@@ -72,14 +60,16 @@ export default function AboutPage() {
               {infoItems.map((item) => (
                 <div key={item.label} className="w-full">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs tracking-[0.28em] text-zinc-500">
+                    <span className="text-xs tracking-[0.32em] text-[#B85A2E]">
                       {item.label}
                     </span>
-                    <span className="h-px flex-1 bg-zinc-700" />
+                    <span className="h-px flex-1 bg-[#E8DDD7]" />
                   </div>
 
-                  <p className="mt-4 text-xl text-white sm:text-2xl">
-                    <span className="mr-2">{item.icon}</span>
+                  <p className="mt-4 text-xl text-[#292B30] sm:text-2xl">
+                    <span className="mr-2 text-xs tracking-[0.28em] text-[#5F5A56]">
+                      {item.icon}
+                    </span>
                     {item.value}
                   </p>
                 </div>
@@ -89,11 +79,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section id="contact" className="w-full py-20">
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <LayoutGrid cards={contactCards} />
-        </div>
-      </section>
     </main>
   );
 }
