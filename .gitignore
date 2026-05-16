@@ -50,6 +50,9 @@
 
 .env*
 !.env.example
+.env.local
+.env.production
+.env*.local
 
 # ----------------------
 

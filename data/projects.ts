@@ -21,13 +21,14 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  
   {
     slug: "llm-distillation-model-behavior-analysis",
     title: "LLM Distillation & Model Behavior Analysis",
     description:
       "A PyTorch and Transformers project exploring cross-architecture LLM distillation, auxiliary-logit transfer, and model behavior shifts between Qwen and Gemma.",
     image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=80",
+      "/llm-distillation.avif",
     author: "Divyam Sharma",
     date: "January 2026",
     role: "AI/ML Engineer",
@@ -85,59 +86,55 @@ export const projects: Project[] = [
       },
     ],
   },
+  
   {
-    slug: "smart-price-prediction-amazon-ml-challenge",
+    slug: "smart-price-prediction",
     title: "Smart Price Prediction",
     description:
       "An Amazon ML Challenge project using NeoBERT, LoRA, log-scaled targets, and SMAPE loss to predict noisy e-commerce prices from sparse product text.",
     image:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80",
+      "/smart-price.png",
     author: "Divyam Sharma",
     date: "October 2025",
-    role: "Machine Learning Engineer",
-    techStack: ["Python", "PyTorch", "NeoBERT", "LoRA", "SMAPE"],
+    role: "AI/ML Engineer",
+    techStack: ["PyTorch", "NeoBERT", "LoRA", "Python", "Transformers"],
     sections: [
       {
         title: "Overview",
         paragraphs: [
-          "Smart Price Prediction was built for the Amazon ML Challenge to estimate product prices from noisy e-commerce data. The project focused on making a text-based model more stable under extreme target variance.",
+          "This project was built for the Amazon ML Challenge 2025, where the task was to predict product prices from catalog text. The data was noisy, sparse, and heavily right-skewed, making ordinary regression unstable.",
+          "The approach centered on fine-tuning NeoBERT with parameter-efficient LoRA adapters, then pairing that with target engineering and a metric-aligned loss.",
         ],
       },
       {
         title: "Problem",
         paragraphs: [
-          "Product pricing data can be sparse, inconsistent, and highly skewed. A model trained directly on raw price targets can overreact to outliers and struggle to generalize across categories.",
+          "Raw price targets amplify outliers, and product descriptions are often too sparse or inconsistently formatted to provide a clean pricing signal. The model needed to learn useful patterns without being dominated by extreme prices.",
         ],
       },
       {
         title: "Solution",
         paragraphs: [
-          "I fine-tuned NeoBERT with LoRA applied to attention layers, using log-scaled targets to reduce variance and SMAPE loss to align training with the competition metric.",
-          "This setup kept the model lightweight enough to iterate quickly while improving robustness on noisy product descriptions.",
+          "I fine-tuned NeoBERT with LoRA on the Q and V attention projections, reducing trainable parameters by about 97% while preserving the backbone representations. Log-scaled targets compressed the price distribution, and SMAPE loss made the error signal more scale-invariant.",
+          "I also inspected CLS embedding behavior and attention head activations to understand which product attributes, especially brand tokens and numeric specs, carried the strongest pricing signal.",
         ],
       },
       {
         title: "Highlights",
-        paragraphs: [
-          "The work centered on reliable modeling choices for messy marketplace data.",
-        ],
+        paragraphs: [],
         list: [
-          "Fine-tuned NeoBERT with LoRA adapters on attention layers",
-          "Used log-scaled targets to reduce the effect of extreme price variance",
-          "Optimized with SMAPE loss for competition-aligned evaluation",
-          "Achieved 41.6 SMAPE on validation",
-        ],
-      },
-      {
-        title: "Repository",
-        paragraphs: [
-          "GitHub: github.com/sharmadivyam/amazon-ml-challenge-NeoBERT-LoRA",
+          "NeoBERT fine-tuned with LoRA on Q and V projections",
+          "About 97% reduction in trainable parameters",
+          "Log-scaled targets to stabilize learning against price variance",
+          "SMAPE loss for symmetric, scale-aware error penalization",
+          "Achieved 41.6 SMAPE on the validation set",
+          "Mixed-precision training, AdamW optimizer, and gradient clipping",
         ],
       },
       {
         title: "Outcome",
         paragraphs: [
-          "The model improved validation stability under sparse textual features and high target variance, producing a stronger baseline for price prediction on marketplace data.",
+          "The model produced a competitive validation score and showed that lightweight fine-tuning with careful loss design can handle noisy marketplace pricing data effectively.",
         ],
       },
     ],
@@ -148,7 +145,7 @@ export const projects: Project[] = [
     description:
       "An edge ML waste-classification system trained with MobileNetV2 and deployed as a compact TensorFlow Lite model on Raspberry Pi.",
     image:
-      "https://images.unsplash.com/photo-1527474305487-b87b222841cc?auto=format&fit=crop&w=1600&q=80",
+      "/waste-classification.png",
     author: "Divyam Sharma",
     date: "August 2025",
     role: "Edge ML Engineer",
@@ -169,19 +166,17 @@ export const projects: Project[] = [
       {
         title: "Solution",
         paragraphs: [
-          "I trained MobileNetV2 on more than 60,000 images with augmentation and class balancing, then converted the final model to TensorFlow Lite for low-latency edge inference.",
-          "The deployed model was about 5MB and ran with under 100ms inference latency on Raspberry Pi.",
+          "I trained MobileNetV2 on more than 60,000 images with augmentation and class balancing, then converted the final model to TensorFlow Lite for low-latency inference.",
+          "The deployment target was practical edge use: a compact model that could run quickly on Raspberry Pi without sending frames to the cloud.",
         ],
       },
       {
         title: "Highlights",
-        paragraphs: [
-          "The system was tuned around practical deployment constraints rather than only offline accuracy.",
-        ],
+        paragraphs: [],
         list: [
           "Trained on 60k+ images with augmentation and class balancing",
           "Reached 97% accuracy across three waste classes",
-          "Converted to a 5MB TensorFlow Lite model",
+          "Converted to a compact TensorFlow Lite model",
           "Delivered sub-100ms inference on Raspberry Pi",
         ],
       },
@@ -194,7 +189,7 @@ export const projects: Project[] = [
       {
         title: "Outcome",
         paragraphs: [
-          "The final model showed that a compact edge deployment could support real-time classification while keeping accuracy high enough for a practical waste-sorting workflow.",
+          "The final model showed that compact edge deployment can support real-time classification while keeping accuracy high enough for a practical waste-sorting workflow.",
         ],
       },
     ],
@@ -203,60 +198,98 @@ export const projects: Project[] = [
     slug: "groomme-ai-recommendation-engine",
     title: "GroomMe - AI Recommendation Engine",
     description:
-      "A Django REST Framework backend for wardrobe modeling, preference-aware recommendations, and Gemini-powered outfit suggestions.",
+      "A full-stack recommendation platform that uses Django REST Framework and Gemini to turn wardrobe data into context-aware outfit suggestions.",
     image:
-      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1600&q=80",
+      "/groomme.png",
     author: "Divyam Sharma",
-    date: "July 2025",
-    role: "Backend & AI Engineer",
-    techStack: ["Django", "Django REST Framework", "Gemini API", "JWT", "SQLite"],
+    date: "August 2025",
+    role: "Full-Stack Engineer",
+    techStack: ["Django", "DRF", "Gemini API", "SQLite", "JWT", "Python"],
     sections: [
       {
         title: "Overview",
         paragraphs: [
-          "GroomMe is an AI recommendation engine for outfit suggestions. I built the backend around wardrobe data, user preferences, secure APIs, and Gemini-powered recommendation generation.",
+          "GroomMe is a backend-first recommendation engine for personalized outfit suggestions. Instead of relying on simple filters, the system uses structured wardrobe data and user preferences to give the model grounded context.",
+          "The platform is built with Django REST Framework, JWT-secured endpoints, and a Gemini API recommendation layer designed around prompt conditioning.",
         ],
       },
       {
         title: "Problem",
         paragraphs: [
-          "Outfit recommendation needs more than a generic text prompt. The system has to understand wardrobe items, user preferences, and context while keeping the data model clean enough for future product features.",
+          "Generic outfit recommendation systems often break down when a user's wardrobe is small or their taste is nuanced. The challenge was to make recommendations feel personal without needing a massive collaborative-filtering dataset.",
         ],
       },
       {
         title: "Solution",
         paragraphs: [
-          "I designed normalized schemas for wardrobe items and user preference modeling, then exposed them through JWT-secured Django REST Framework APIs.",
-          "Gemini API integration used prompt conditioning and attribute filtering so recommendations could respond to actual wardrobe and preference data.",
+          "I modeled wardrobe items and style preferences as normalized metadata, then passed only the relevant attributes into Gemini. That keeps the recommendation grounded in what the user owns instead of letting the model drift into generic styling advice.",
+          "Authentication is handled with SimpleJWT, while custom request-validation middleware helps protect user data across the API surface.",
         ],
       },
       {
         title: "Highlights",
-        paragraphs: [
-          "The backend was structured to support both reliable data management and AI-assisted recommendation quality.",
-        ],
+        paragraphs: [],
         list: [
-          "Built DRF APIs for wardrobe and preference modeling",
-          "Added JWT-secured endpoints for authenticated access",
-          "Integrated Gemini API for context-aware outfit recommendations",
-          "Used prompt conditioning and attribute filtering to improve relevance",
+          "DRF backend with normalized wardrobe and preference schemas",
+          "JWT-secured APIs with request validation and logging middleware",
+          "Gemini API integration with prompt conditioning and attribute filtering",
+          "Context-aware outfit suggestions grounded in user-owned wardrobe items",
         ],
-      },
-      {
-        title: "Repository",
-        paragraphs: [
-          "GitHub: github.com/sharmadivyam/GroomMe",
-        ],
-        code: {
-          language: "python",
-          snippet:
-            "recommendation_context = {\n  \"wardrobe_items\": user_wardrobe,\n  \"preferences\": style_profile,\n  \"filters\": [\"occasion\", \"weather\", \"color_match\"],\n}",
-        },
       },
       {
         title: "Outcome",
         paragraphs: [
-          "The project created a practical backend foundation for AI styling features, combining structured wardrobe data with prompt-conditioned generation.",
+          "The project showed that LLM-driven personalization can work well in a constrained domain when the input context is carefully structured. The prompt design and metadata model carried more value than a large training pipeline would have at this stage.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "lexigrade-text-readability-classifier",
+    title: "LexiGrade - Text Readability Classifier",
+    description:
+      "A calibrated NLP pipeline that combines LightGBM, sentence-transformer embeddings, and classical readability indices to classify text by reading level.",
+    image:
+      "/lexigrade.avif",
+    author: "Divyam Sharma",
+    date: "April 2026",
+    role: "ML Engineer",
+    techStack: ["LightGBM", "all-MiniLM-L6-v2", "Python", "Scikit-learn", "NLP"],
+    sections: [
+      {
+        title: "Overview",
+        paragraphs: [
+          "LexiGrade predicts the reading level of a passage by combining semantic and linguistic signals. Rather than depending only on formulas like Flesch-Kincaid, it fuses sentence-transformer embeddings with classical readability features.",
+          "The project was designed for skewed real-world data, where expert-level text is underrepresented and naive classifiers tend to underperform on the hardest class.",
+        ],
+      },
+      {
+        title: "Problem",
+        paragraphs: [
+          "Classical readability indices are useful but shallow: they cannot fully capture semantic complexity. Transformer embeddings add semantic signal, but on small expert-class samples they can overfit. The challenge was to combine both without letting label imbalance dominate the model.",
+        ],
+      },
+      {
+        title: "Solution",
+        paragraphs: [
+          "I trained a LightGBM regressor on a combined feature vector: all-MiniLM-L6-v2 embeddings plus handcrafted linguistic features. A stratified split and 2.5x expert-class weighting helped the model pay attention to the rare upper-grade examples.",
+          "A calibrated fusion layer blends the ML score with FRE, FKG, FOG, SMOG, CLI, and ARI. An ML trust override catches short high-FRE sentences that classical formulas incorrectly mark as easy.",
+        ],
+      },
+      {
+        title: "Highlights",
+        paragraphs: [],
+        list: [
+          "LightGBM over transformer embeddings and handcrafted linguistic features",
+          "Stratified split with 2.5x expert-class sample weight boosting",
+          "Fusion layer across FRE, FKG, FOG, SMOG, CLI, and ARI readability indices",
+          "ML trust override for high-confidence expert-level edge cases",
+        ],
+      },
+      {
+        title: "Outcome",
+        paragraphs: [
+          "The calibrated fusion approach improved expert-class recall compared with either the ML model or classical indices alone, showing that semantic embeddings and readability formulas capture complementary signals.",
         ],
       },
     ],

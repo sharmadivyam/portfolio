@@ -29,7 +29,7 @@ export function InfiniteMovingCards({
       {images.map((image, index) => (
         <div
           key={`${image.src}-${index}`}
-          className={`relative h-[280px] w-[220px] flex-none overflow-hidden rounded-lg border border-[#E8DDD7] ${cardClassName}`}
+          className={`relative h-[280px] w-[220px] flex-none overflow-hidden rounded-lg border border-[#E8DDD7] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[#B85A2E] active:-translate-y-0.5 active:border-[#B85A2E] ${cardClassName}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -51,6 +51,16 @@ export function InfiniteMovingCards({
         }
       }}
       onMouseLeave={() => {
+        if (pauseOnHover) {
+          setIsPaused(false);
+        }
+      }}
+      onTouchStart={() => {
+        if (pauseOnHover) {
+          setIsPaused(true);
+        }
+      }}
+      onTouchEnd={() => {
         if (pauseOnHover) {
           setIsPaused(false);
         }

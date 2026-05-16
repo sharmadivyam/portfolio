@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
-  <rect width="1600" height="1000" fill="#F7F2EF"/>
-  <circle cx="800" cy="420" r="220" fill="#FFF9F6" stroke="#E8DDD7" stroke-width="14"/>
-  <circle cx="725" cy="380" r="24" fill="#B85A2E"/>
-  <circle cx="875" cy="380" r="24" fill="#B85A2E"/>
-  <path d="M700 520c45 35 155 35 200 0" fill="none" stroke="#5F5A56" stroke-width="18" stroke-linecap="round"/>
-  <text x="110" y="860" fill="#292B30" font-size="96" font-family="Inter, Arial, sans-serif">GitHub</text>
-</svg>

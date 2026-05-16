@@ -1,25 +1,77 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
-const serviceOptions = ["Web Dev", "AI", "UI/UX"] as const;
+const serviceOptions = ["Web Dev", "AI", "UI/UX", "Research / ML"] as const;
 const countryCodes = ["+91", "+1", "+44", "+61", "+49", "+33", "+81", "+86"] as const;
 
 type ServiceOption = (typeof serviceOptions)[number];
 
 export default function ContactPage() {
   const [selectedService, setSelectedService] = useState<ServiceOption>("Web Dev");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      countryCode: String(formData.get("countryCode") ?? ""),
+      phone: String(formData.get("phone") ?? ""),
+      service: selectedService,
+      idea: String(formData.get("idea") ?? ""),
+    };
+
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setSubmitMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Something went wrong. Please try again.");
+      }
+
+      form.reset();
+      setSelectedService("Web Dev");
+      setSubmitStatus("success");
+      setSubmitMessage("Thanks. Your message has been sent successfully.");
+    } catch (error) {
+      setSubmitStatus("error");
+      setSubmitMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#F7F2EF] text-[#292B30]">
       <SiteHeader activePage="contact" />
 
       <section className="relative isolate w-full px-4 pb-16 pt-28 sm:px-6 sm:pb-20">
-        <div className="mx-auto grid w-full max-w-7xl overflow-hidden rounded-[2rem] border border-[#E8DDD7] bg-[#FFF9F6] lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="relative flex min-h-[360px] flex-col justify-between overflow-hidden border-b border-[#E8DDD7] p-8 sm:p-10 lg:min-h-[720px] lg:border-r lg:border-b-0">
+        <div className="mx-auto grid w-full max-w-7xl overflow-hidden lg:rounded-[2rem] lg:border lg:border-[#E8DDD7] lg:bg-[#FFF9F6] lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="relative hidden min-h-[360px] flex-col justify-between overflow-hidden border-b border-[#E8DDD7] p-8 sm:p-10 lg:flex lg:min-h-[720px] lg:border-r lg:border-b-0">
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#E8DDD7] bg-transparent px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-[#B85A2E]">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -27,7 +79,7 @@ export default function ContactPage() {
               </div>
 
               <h1 className="mt-6 max-w-lg text-5xl font-bold leading-[0.95] tracking-tight text-[#292B30] sm:text-6xl lg:text-7xl">
-                Tell me what you&apos;re building next.
+                Have an idea or opportunity? Let&apos;s talk.
               </h1>
 
               <p className="mt-5 max-w-xl text-base leading-7 text-[#5F5A56] sm:text-lg">
@@ -38,10 +90,10 @@ export default function ContactPage() {
 
             <div className="relative z-10 mt-10 grid gap-4 sm:grid-cols-2">
               {[
-                "Fast response for serious ideas",
-                "Clear scope, timeline, and next steps",
-                "Portfolio sites, AI tools, and launch-ready MVPs",
-                "Built with product thinking and engineering depth",
+                "Open to internships and research roles",
+                "Building in AI/ML and backend systems",
+                "Fast response, clear next steps",
+                "Serious about shipping real projects",
               ].map((item) => (
                 <div
                   key={item}
@@ -53,9 +105,10 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="relative p-7 sm:p-9 lg:p-12">
+          <div className="relative lg:p-12">
             <motion.form
-              className="relative z-10 rounded-[1.75rem] border border-[#E8DDD7] bg-[#F7F2EF] p-7 sm:p-9 lg:p-10"
+              className="relative z-10 bg-transparent lg:rounded-[1.75rem] lg:border lg:border-[#E8DDD7] lg:bg-[#F7F2EF] lg:p-10"
+              onSubmit={handleSubmit}
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
@@ -137,10 +190,10 @@ export default function ContactPage() {
                         className={`relative overflow-hidden rounded-xl border bg-transparent p-4 text-left transition duration-200 ease-out ${
                           isSelected
                             ? "border-[#B85A2E]"
-                            : "border-[#E8DDD7] hover:border-[#B85A2E]"
+                            : "border-[#E8DDD7] hover:border-[#B85A2E] active:border-[#B85A2E]"
                         }`}
                         whileHover={{ y: -2 }}
-                        whileTap={{ y: 0 }}
+                        whileTap={{ y: -2 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
                       >
                         <motion.span
@@ -187,14 +240,28 @@ export default function ContactPage() {
                 </label>
               </div>
 
+              {submitMessage ? (
+                <p
+                  role={submitStatus === "error" ? "alert" : "status"}
+                  className={`mt-6 rounded-xl border px-4 py-3 text-sm leading-6 ${
+                    submitStatus === "success"
+                      ? "border-[#B85A2E] bg-[#FFF9F6] text-[#292B30]"
+                      : "border-red-200 bg-red-50 text-red-700"
+                  }`}
+                >
+                  {submitMessage}
+                </p>
+              ) : null}
+
               <motion.button
                 type="submit"
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#24272C] bg-[#24272C] px-5 py-4 text-base font-semibold text-[#FFF9F6] transition duration-200 ease-out hover:border-[#B85A2E] hover:bg-transparent hover:text-[#B85A2E]"
+                disabled={isSubmitting}
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#24272C] bg-[#24272C] px-5 py-4 text-base font-semibold text-[#FFF9F6] transition duration-200 ease-out hover:border-[#B85A2E] hover:bg-transparent hover:text-[#B85A2E] active:-translate-y-0.5 active:border-[#B85A2E] active:bg-transparent active:text-[#B85A2E] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:border-[#24272C] disabled:hover:bg-[#24272C] disabled:hover:text-[#FFF9F6] disabled:active:translate-y-0 disabled:active:border-[#24272C] disabled:active:bg-[#24272C] disabled:active:text-[#FFF9F6]"
                 whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
+                whileTap={{ y: -2 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
               >
-                Submit
+                {isSubmitting ? "Sending..." : "Let's talk"}
                 <ArrowUpRight className="h-4 w-4" />
               </motion.button>
             </motion.form>
@@ -209,6 +276,7 @@ const serviceCopy: Record<ServiceOption, string> = {
   "Web Dev": "Websites and platforms",
   AI: "AI-driven product features",
   "UI/UX": "Flows, interfaces, systems",
+  "Research / ML": "Models, pipelines, and research",
 };
 
 type InputFieldProps = {

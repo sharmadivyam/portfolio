@@ -10,12 +10,14 @@
   --surface: #FCF8F4;
   --button: #24272C;
   --font-inter: Inter, Arial, Helvetica, sans-serif;
+  --font-playfair: var(--font-playfair-display), "Playfair Display", serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
 }
 
 body {

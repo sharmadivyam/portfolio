@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { CTASection } from "@/components/cta-section";
 import { Footer } from "@/components/footer";
+import { RouteCTASection } from "@/components/route-cta-section";
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+  weight: ["400"],
+  variable: "--font-playfair-display",
+});
 
 export const metadata: Metadata = {
   title: "Divyam Sharma",
@@ -14,10 +22,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`${playfairDisplay.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <div className="flex-1">{children}</div>
-        <CTASection />
+        <RouteCTASection />
         <Footer />
       </body>
     </html>

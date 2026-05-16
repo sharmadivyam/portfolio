@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
-  <rect width="1600" height="1000" fill="#F7F2EF"/>
-  <circle cx="360" cy="300" r="220" fill="#E8DDD7"/>
-  <rect x="720" y="220" width="520" height="420" rx="30" fill="#FFF9F6" stroke="#E8DDD7"/>
-  <path d="M800 320h360l-180 140-180-140Z" fill="#B85A2E"/>
-  <rect x="800" y="320" width="360" height="220" rx="20" fill="none" stroke="#5F5A56"/>
-  <text x="110" y="860" fill="#292B30" font-size="96" font-family="Inter, Arial, sans-serif">Contact</text>
-</svg>

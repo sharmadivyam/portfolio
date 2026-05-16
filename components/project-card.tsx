@@ -21,7 +21,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
   return (
     <Link href={`/projects/${slug}`} className="block">
-      <article className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E8DDD7] bg-[#FFF9F6] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[#B85A2E]">
+      <article className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E8DDD7] bg-[#FFF9F6] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[#B85A2E] active:-translate-y-0.5 active:border-[#B85A2E]">
         <div className="flex flex-col gap-5 p-3 sm:p-4 lg:flex-row lg:items-stretch">
           <div className="relative min-h-[260px] overflow-hidden rounded-xl lg:min-h-[320px] lg:w-[55%]">
             <Image

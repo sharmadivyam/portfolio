@@ -9,7 +9,7 @@ export default function WorkPage() {
 
       <section className="w-full border-b border-[#E8DDD7] py-24 pt-28 sm:pt-32">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <h1 className="mb-4 text-6xl font-bold leading-[0.9] tracking-tight text-[#292B30] md:text-8xl">
+          <h1 className="mb-4 font-serif text-6xl font-normal italic leading-[0.9] tracking-normal text-[#292B30] sm:text-7xl md:text-8xl">
             Work
           </h1>
 

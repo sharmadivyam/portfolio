@@ -20,6 +20,8 @@ export const contactCards: LayoutGridCard[] = [
     content: "Resume",
     className: "md:col-span-1",
     thumbnail: "/grid/blog.svg",
+    href: "https://drive.google.com/file/d/1E0QOTR2uLefoy9IRS6BD_riyYTdBYibd/view?usp=sharing",
+    external: true,
   },
   {
     id: 4,
@@ -33,7 +35,7 @@ export const contactCards: LayoutGridCard[] = [
     content: "GitHub",
     className: "md:col-span-2",
     thumbnail: "/grid/github.svg",
-    href: "https://github.com/",
+    href: "https://github.com/sharmadivyam",
     external: true,
   },
   {
@@ -41,7 +43,7 @@ export const contactCards: LayoutGridCard[] = [
     content: "LinkedIn",
     className: "md:col-span-1",
     thumbnail: "/grid/linkedin.svg",
-    href: "https://www.linkedin.com/",
+    href: "https://www.linkedin.com/in/divyam-sharma-4a8a562b0/",
     external: true,
   },
 ];

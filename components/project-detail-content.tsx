@@ -66,7 +66,7 @@ export function ProjectDetailContent({
           </div>
 
           <article className="mx-auto mt-16 max-w-3xl">
-            <div className="prose max-w-none prose-headings:mt-10 prose-headings:font-semibold prose-headings:leading-[0.98] prose-headings:tracking-tight prose-headings:text-[#292B30] prose-p:leading-relaxed prose-p:text-[#5F5A56] prose-a:text-[#B85A2E] prose-a:underline-offset-4 hover:prose-a:text-[#B85A2E] prose-strong:text-[#292B30] prose-li:text-[#5F5A56] prose-pre:rounded-2xl prose-pre:border prose-pre:border-[#E8DDD7] prose-pre:bg-[#FFF9F6]">
+            <div className="prose max-w-none prose-headings:mt-10 prose-headings:font-semibold prose-headings:leading-[0.98] prose-headings:tracking-tight prose-headings:text-[#292B30] prose-p:leading-relaxed prose-p:text-[#5F5A56] prose-a:text-[#B85A2E] prose-a:underline-offset-4 hover:prose-a:text-[#B85A2E] prose-strong:text-[#292B30] prose-li:text-[#5F5A56] prose-pre:rounded-2xl prose-pre:border prose-pre:border-[#E8DDD7] prose-pre:bg-[#FFF9F6] prose-pre:text-[#292B30] prose-code:text-[#292B30]">
               {project.sections.map((section) => (
                 <section key={section.title}>
                   <h2>{section.title}</h2>

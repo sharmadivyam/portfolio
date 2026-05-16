@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { SVGProps } from "react";
-import { ArrowRight, BookOpen, Mail, UserRound } from "lucide-react";
+import { ArrowRight, Mail, UserRound } from "lucide-react";
 
 const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -18,25 +18,25 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 22.43 1s-1.8 1.1-3.36 1.5A4.48 4.48 0 0 0 16.5 1c-2.73 0-4.95 2.2-4.95 4.92 0 .39.04.76.13 1.12C7.69 6.88 4.07 5.13 1.64 2.16c-.43.74-.66 1.6-.66 2.52 0 1.74.88 3.28 2.22 4.18A4.48 4.48 0 0 1 .96 8.3v.06c0 2.42 1.72 4.44 4 4.9a4.48 4.48 0 0 1-2 .08 4.52 4.52 0 0 0 4.2 3.14A9 9 0 0 1 1 19.54a12.73 12.73 0 0 0 6.92 2.03c8.3 0 12.84-6.87 12.84-12.83 0-.2 0-.41-.02-.61A9.2 9.2 0 0 0 23 3z" />
-  </svg>
-);
-
 const linkGroups = [
   {
     items: [
-      { label: "My Resume", href: "/resume.pdf", icon: UserRound },
-      { label: "Email Me", href: "mailto:hello@divyamsharma.com", icon: Mail },
-      { label: "GitHub", href: "https://github.com/sharmadivyam", icon: GitHubIcon },
+      {
+        label: "My Resume",
+        href: "https://drive.google.com/file/d/1E0QOTR2uLefoy9IRS6BD_riyYTdBYibd/view?usp=sharing",
+        icon: UserRound,
+      },
+      { label: "Email Me", href: "mailto:sharmadivyam86@gmail.com", icon: Mail },
     ],
   },
   {
     items: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/", icon: LinkedInIcon },
-      { label: "Twitter", href: "https://twitter.com/", icon: TwitterIcon },
-      { label: "My Blog", href: "/blog", icon: BookOpen },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/divyam-sharma-4a8a562b0/",
+        icon: LinkedInIcon,
+      },
+      { label: "GitHub", href: "https://github.com/sharmadivyam", icon: GitHubIcon },
     ],
   },
 ];
@@ -53,10 +53,6 @@ export function Footer() {
             <span className="text-base font-semibold tracking-tight">Divyam</span>
           </Link>
 
-          <div className="space-y-2 text-sm leading-relaxed text-[#6F6A66]">
-            <p>&copy; 2024 Divyam Sharma</p>
-            <p>All rights reserved.</p>
-          </div>
         </div>
 
         <nav
@@ -72,13 +68,13 @@ export function Footer() {
                     key={item.label}
                     href={item.href}
                     prefetch={false}
-                    className="group grid min-w-64 grid-cols-[1.5rem_1fr_1.25rem] items-center gap-5 py-1 text-sm font-medium text-[#292B30] transition duration-200 hover:text-[#B85A2E]"
+                    className="group grid min-w-64 grid-cols-[1.5rem_1fr_1.25rem] items-center gap-5 py-1 text-sm font-medium text-[#292B30] transition duration-200 hover:text-[#B85A2E] active:text-[#B85A2E]"
                     target={item.href.startsWith("http") ? "_blank" : undefined}
                     rel={item.href.startsWith("http") ? "noreferrer" : undefined}
                   >
-                    <Icon className="h-5 w-5 text-[#292B30] transition duration-200 group-hover:text-[#B85A2E]" />
+                    <Icon className="h-5 w-5 text-[#292B30] transition duration-200 group-hover:text-[#B85A2E] group-active:text-[#B85A2E]" />
                     <span>{item.label}</span>
-                    <span className="flex items-center justify-end text-[#B85A2E] transition-transform duration-200 group-hover:translate-x-1">
+                    <span className="flex items-center justify-end text-[#B85A2E] transition-transform duration-200 group-hover:translate-x-1 group-active:translate-x-1">
                       <ArrowRight className="h-4 w-4" />
                     </span>
                   </Link>
