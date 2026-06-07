@@ -17,8 +17,8 @@ import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 import { projects } from "@/data/projects";
 
 const featuredProjectSlugs = [
+  "what-if-counterfactual-history-engine",
   "llm-distillation-model-behavior-analysis",
-  "smart-price-prediction",
   "real-time-waste-classification-edge-ml",
 ];
 
