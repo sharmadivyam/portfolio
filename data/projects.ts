@@ -2,6 +2,10 @@ export type ProjectSection = {
   title: string;
   paragraphs: string[];
   list?: string[];
+  links?: {
+    label: string;
+    href: string;
+  }[];
   code?: {
     language: string;
     snippet: string;
@@ -21,6 +25,56 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    slug: "lexigrade-text-readability-classifier",
+    title: "LexiGrade - Text Readability Classifier",
+    description:
+      "A calibrated NLP pipeline that combines LightGBM, sentence-transformer embeddings, and classical readability indices to classify text by reading level.",
+    image:
+      "/lexigrade.avif",
+    author: "Divyam Sharma",
+    date: "April 2026",
+    role: "ML Engineer",
+    techStack: ["LightGBM", "all-MiniLM-L6-v2", "Python", "Scikit-learn", "NLP"],
+    sections: [
+      {
+        title: "Overview",
+        paragraphs: [
+          "LexiGrade predicts the reading level of a passage by combining semantic and linguistic signals. Rather than depending only on formulas like Flesch-Kincaid, it fuses sentence-transformer embeddings with classical readability features.",
+          "The project was designed for skewed real-world data, where expert-level text is underrepresented and naive classifiers tend to underperform on the hardest class.",
+        ],
+      },
+      {
+        title: "Problem",
+        paragraphs: [
+          "Classical readability indices are useful but shallow: they cannot fully capture semantic complexity. Transformer embeddings add semantic signal, but on small expert-class samples they can overfit. The challenge was to combine both without letting label imbalance dominate the model.",
+        ],
+      },
+      {
+        title: "Solution",
+        paragraphs: [
+          "I trained a LightGBM regressor on a combined feature vector: all-MiniLM-L6-v2 embeddings plus handcrafted linguistic features. A stratified split and 2.5x expert-class weighting helped the model pay attention to the rare upper-grade examples.",
+          "A calibrated fusion layer blends the ML score with FRE, FKG, FOG, SMOG, CLI, and ARI. An ML trust override catches short high-FRE sentences that classical formulas incorrectly mark as easy.",
+        ],
+      },
+      {
+        title: "Highlights",
+        paragraphs: [],
+        list: [
+          "LightGBM over transformer embeddings and handcrafted linguistic features",
+          "Stratified split with 2.5x expert-class sample weight boosting",
+          "Fusion layer across FRE, FKG, FOG, SMOG, CLI, and ARI readability indices",
+          "ML trust override for high-confidence expert-level edge cases",
+        ],
+      },
+      {
+        title: "Outcome",
+        paragraphs: [
+          "The calibrated fusion approach improved expert-class recall compared with either the ML model or classical indices alone, showing that semantic embeddings and readability formulas capture complementary signals.",
+        ],
+      },
+    ],
+  },
 {
   slug: "what-if-counterfactual-history-engine",
   title: "WHAT IF? - Counterfactual History Engine.",
@@ -106,9 +160,10 @@ export const projects: Project[] = [
     },
     {
       title: "Repository",
-      paragraphs: [
-        "GitHub: github.com/divyamsharma/what-if",
-        "Live demo: what-iff.streamlit.app",
+      paragraphs: [],
+      links: [
+        { label: "GitHub", href: "https://github.com/sharmadivyam/what-if" },
+        { label: "Live demo", href: "https://what-iff.streamlit.app" },
       ],
       code: {
         language: "python",
@@ -174,8 +229,12 @@ export const projects: Project[] = [
       },
       {
         title: "Repository",
-        paragraphs: [
-          "GitHub: github.com/sharmadivyam/Subliminal_learning_LLMs_MNIST",
+        paragraphs: [],
+        links: [
+          {
+            label: "GitHub",
+            href: "https://github.com/sharmadivyam/Subliminal_learning_LLMs_MNIST",
+          },
         ],
         code: {
           language: "python",
@@ -287,8 +346,12 @@ export const projects: Project[] = [
       },
       {
         title: "Repository",
-        paragraphs: [
-          "GitHub: github.com/khushwant1234/EcoBin_SIH_APP",
+        paragraphs: [],
+        links: [
+          {
+            label: "GitHub",
+            href: "https://github.com/khushwant1234/EcoBin_SIH_APP",
+          },
         ],
       },
       {
@@ -345,56 +408,6 @@ export const projects: Project[] = [
         title: "Outcome",
         paragraphs: [
           "The project showed that LLM-driven personalization can work well in a constrained domain when the input context is carefully structured. The prompt design and metadata model carried more value than a large training pipeline would have at this stage.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "lexigrade-text-readability-classifier",
-    title: "LexiGrade - Text Readability Classifier",
-    description:
-      "A calibrated NLP pipeline that combines LightGBM, sentence-transformer embeddings, and classical readability indices to classify text by reading level.",
-    image:
-      "/lexigrade.avif",
-    author: "Divyam Sharma",
-    date: "April 2026",
-    role: "ML Engineer",
-    techStack: ["LightGBM", "all-MiniLM-L6-v2", "Python", "Scikit-learn", "NLP"],
-    sections: [
-      {
-        title: "Overview",
-        paragraphs: [
-          "LexiGrade predicts the reading level of a passage by combining semantic and linguistic signals. Rather than depending only on formulas like Flesch-Kincaid, it fuses sentence-transformer embeddings with classical readability features.",
-          "The project was designed for skewed real-world data, where expert-level text is underrepresented and naive classifiers tend to underperform on the hardest class.",
-        ],
-      },
-      {
-        title: "Problem",
-        paragraphs: [
-          "Classical readability indices are useful but shallow: they cannot fully capture semantic complexity. Transformer embeddings add semantic signal, but on small expert-class samples they can overfit. The challenge was to combine both without letting label imbalance dominate the model.",
-        ],
-      },
-      {
-        title: "Solution",
-        paragraphs: [
-          "I trained a LightGBM regressor on a combined feature vector: all-MiniLM-L6-v2 embeddings plus handcrafted linguistic features. A stratified split and 2.5x expert-class weighting helped the model pay attention to the rare upper-grade examples.",
-          "A calibrated fusion layer blends the ML score with FRE, FKG, FOG, SMOG, CLI, and ARI. An ML trust override catches short high-FRE sentences that classical formulas incorrectly mark as easy.",
-        ],
-      },
-      {
-        title: "Highlights",
-        paragraphs: [],
-        list: [
-          "LightGBM over transformer embeddings and handcrafted linguistic features",
-          "Stratified split with 2.5x expert-class sample weight boosting",
-          "Fusion layer across FRE, FKG, FOG, SMOG, CLI, and ARI readability indices",
-          "ML trust override for high-confidence expert-level edge cases",
-        ],
-      },
-      {
-        title: "Outcome",
-        paragraphs: [
-          "The calibrated fusion approach improved expert-class recall compared with either the ML model or classical indices alone, showing that semantic embeddings and readability formulas capture complementary signals.",
         ],
       },
     ],

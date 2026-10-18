@@ -9,7 +9,7 @@
   --accent: #B85A2E;
   --surface: #FCF8F4;
   --button: #24272C;
-  --font-inter: Inter, Arial, Helvetica, sans-serif;
+  --font-inter: var(--font-inter-sans), "Inter", Arial, Helvetica, sans-serif;
   --font-playfair: var(--font-playfair-display), "Playfair Display", serif;
 }
 
@@ -18,6 +18,24 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
+  --font-display: var(--font-afacad), "Futura", "Jost", sans-serif;
+  --font-terminal: var(--font-martian-mono), ui-monospace, monospace;
+}
+
+/* The space theme: midnight blue with a cream accent, plus the palette's warm colours */
+@theme {
+  --color-night: #0a1430;
+  --color-night-mid: #12224f;
+  --color-night-glow: #1c3270;
+  --color-night-card: #0d1a3d;
+  --color-cream: #f3e8cc;
+  --color-cream-muted: #c9d0e4;
+  --color-cream-faint: #98a2c2;
+  --color-sunshine: #ffc926;
+  --color-carrot: #f96015;
+  --color-tomato: #d52518;
+  --color-forest: #18542a;
+  --color-kiwi: #9abc05;
 }
 
 body {
@@ -28,7 +46,7 @@ body {
 
 html,
 body {
-  background-color: #F5F1EC;
+  background-color: #0a1430;
 }
 
 @keyframes marquee-left {
@@ -49,4 +67,9 @@ body {
   to {
     transform: translateX(0);
   }
+}
+
+/* Shared links open straight onto the map: hide the title screen before the first paint */
+html[data-deeplink] [data-title-screen] {
+  display: none;
 }

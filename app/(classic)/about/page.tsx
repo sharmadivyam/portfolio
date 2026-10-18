@@ -17,9 +17,9 @@ const galleryImages = [
   { src: aboutImage4.src, alt: "Lifestyle frame" },
   { src: aboutImage5.src, alt: "Studio-inspired portrait" },
   { src: aboutImage6.src, alt: "Natural light portrait" },
-  { src: aboutImage7.src, alt: "X" },
-  { src: aboutImage8.src, alt: "Y" },
-  { src: aboutImage9.src, alt: "Z" },
+  { src: aboutImage7.src, alt: "Holding my Breeze 2025 IG Lead pass in front of the main stage" },
+  { src: aboutImage8.src, alt: "XCELERATE Ideathon 3.0 Marketing Lead badge on a blazer" },
+  { src: aboutImage9.src, alt: "Team selfie at a hackathon workstation" },
 ];
 
 const infoItems = [

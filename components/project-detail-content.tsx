@@ -73,6 +73,14 @@ export function ProjectDetailContent({
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
+                  {section.links?.map((link) => (
+                    <p key={link.href}>
+                      {link.label}:{" "}
+                      <a href={link.href} target="_blank" rel="noreferrer">
+                        {link.href.replace(/^https?:\/\//, "")}
+                      </a>
+                    </p>
+                  ))}
                   {section.list ? (
                     <ul>
                       {section.list.map((item) => (

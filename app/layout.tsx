@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Afacad, Inter, Martian_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Footer } from "@/components/footer";
-import { RouteCTASection } from "@/components/route-cta-section";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter-sans",
+});
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -11,9 +14,20 @@ const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
 });
 
+const afacad = Afacad({
+  subsets: ["latin"],
+  variable: "--font-afacad",
+});
+
+const martianMono = Martian_Mono({
+  subsets: ["latin"],
+  variable: "--font-martian-mono",
+});
+
 export const metadata: Metadata = {
   title: "Divyam Sharma",
-  description: "Portfolio of Divyam Sharma — AI systems, product engineering, and creative work.",
+  description:
+    "AI engineer. I build LLM systems that are grounded, measured and safe to ship, from agent pipelines and gateways to models on a Raspberry Pi.",
 };
 
 export default function RootLayout({
@@ -22,12 +36,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfairDisplay.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <div className="flex-1">{children}</div>
-        <RouteCTASection />
-        <Footer />
-      </body>
+    <html
+      lang="en"
+      // The home page tags <html> before hydration so shared links skip the title screen.
+      suppressHydrationWarning
+      className={`${inter.variable} ${playfairDisplay.variable} ${afacad.variable} ${martianMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
