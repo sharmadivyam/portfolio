@@ -44,6 +44,7 @@ export default async function StoryPage({ params }: Props) {
           </p>
           <div className="flex gap-2.5">
             <Link href="/skim" className={barLink}>Skim</Link>
+            <Link href="/contact" className={barLink}>Contact</Link>
             <Link href={back} className={barLink}>← Back to the map</Link>
           </div>
         </div>

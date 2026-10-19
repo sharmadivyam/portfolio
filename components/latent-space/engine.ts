@@ -97,7 +97,7 @@ function buildNodes(): MapNode[] {
     }),
     ...skills.map((skill) => ({
       id: `skill-${skill.name}`, world: null, object: null, latent: skill.at, color: SKILL,
-      name: skill.name, kind: "skill", blurb: skill.note, side: skill.side, home: worlds[worldIndex(skill.world)].name,
+      name: skill.name, kind: "skill", blurb: skill.note, side: skill.side, home: skill.world === "origin" ? undefined : worlds[worldIndex(skill.world)].name,
       neighbours: [], sx: 0, sy: 0, alpha: 0,
     })),
   ];
@@ -850,7 +850,7 @@ export class LatentSpaceEngine {
       [code, title, text] = [worldPath(h.world), w.name, `${w.description} Click to step inside.`];
     } else {
       const n = h.node;
-      const code0 = n.home ? `skill · used in ${n.home.toLowerCase()}` : `${n.kind}  z = (${n.latent[0].toFixed(2)}, ${n.latent[1].toFixed(2)})`;
+      const code0 = n.home ? `skill · used in ${n.home.toLowerCase()}` : n.kind === "skill" ? "skill" : `${n.kind}  z = (${n.latent[0].toFixed(2)}, ${n.latent[1].toFixed(2)})`;
       [code, title, text] = [code0, n.name, n.blurb];
     }
     const set = (part: string, value: string) => {

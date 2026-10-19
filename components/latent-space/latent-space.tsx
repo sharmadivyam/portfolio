@@ -13,7 +13,7 @@ const SKY_CSS = `radial-gradient(circle 85vmax at 42% 55%, ${SKY.map(([stop, col
 
 const press = "transition duration-150 ease-out hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5";
 const shadow = "shadow-[3px_3px_0_#050b1c] hover:shadow-[4px_4px_0_#050b1c] active:shadow-[1px_1px_0_#050b1c]";
-const barButton = `inline-flex items-center rounded-[10px] border-2 border-cream px-3 pb-[7px] pt-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.05em] md:px-3.5 md:text-[14px] ${shadow} ${press}`;
+const barButton = `inline-flex items-center rounded-[10px] border-2 border-cream px-2.5 pb-[7px] pt-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.05em] md:px-3.5 md:text-[14px] ${shadow} ${press}`;
 const textLink = "font-display text-base font-semibold text-cream underline decoration-carrot decoration-[3px] underline-offset-[5px] transition hover:text-sunshine";
 const smallButton = "rounded-[10px] border-2 border-cream/30 px-3 py-2 font-display text-[14px] font-semibold text-cream transition hover:border-cream";
 const tourButton = "rounded-full border-2 border-night/20 px-3 py-1.5 font-display text-[14px] font-semibold transition hover:border-night";
@@ -221,11 +221,11 @@ export function LatentSpace() {
       setGather(gatherRef.current);
       if (gatherRef.current >= 1) enterMap();
     };
-    const onWheel = (e: WheelEvent) => advance(e.deltaY / 1100);
+    const onWheel = (e: WheelEvent) => advance(e.deltaY / 420);
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0]?.clientY;
       if (touchY === null || y === undefined) return;
-      advance((touchY - y) / 420);
+      advance((touchY - y) / 220);
       touchY = y;
     };
     const onKey = (e: KeyboardEvent) => {
@@ -387,7 +387,7 @@ export function LatentSpace() {
             results.slice(0, 7).map((hit) => {
               const w = hit.kind === "world" ? hit.world : worlds.find((x) => x.key === (hit.kind === "item" ? hit.item.world : hit.skill.world));
               const label = hit.kind === "world" ? hit.world.name : hit.kind === "item" ? shortName(hit.item) : hit.skill.name;
-              const note = hit.kind === "world" ? `world · ${hit.world.label}` : hit.kind === "skill" ? `skill · ${w?.name.toLowerCase()}` : w?.name.toLowerCase();
+              const note = hit.kind === "world" ? `world · ${hit.world.label}` : hit.kind === "skill" ? (hit.skill.world === "origin" ? "skill" : `skill · ${w?.name.toLowerCase()}`) : w?.name.toLowerCase();
               return (
                 <button key={`${hit.kind}-${label}`} type="button" onClick={() => openResult(hit)}
                   className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2 text-left text-cream transition hover:bg-cream hover:text-night">
@@ -447,9 +447,9 @@ export function LatentSpace() {
       <header ref={barRef} inert={intro} className={`absolute inset-x-0 top-0 z-20 flex items-center gap-3 px-4 pt-4 transition duration-500 md:px-8 md:pt-6 ${intro ? `${hidden} -translate-y-2` : ""}`}>
         <button type="button" onClick={backToStart} className="text-left" aria-label="Back to the start">
           <span className="block font-terminal text-[11.5px] leading-[1.6] text-kiwi max-md:hidden">~/divyam</span>
-          <span className="block font-display text-[22px] font-bold uppercase leading-none text-cream transition hover:text-sunshine md:text-[26px]">Divyam Sharma</span>
+          <span className="block font-display text-[19px] font-bold uppercase leading-none text-cream transition hover:text-sunshine md:text-[26px]">Divyam Sharma</span>
         </button>
-        <div className="ml-auto flex items-center gap-2.5 md:gap-3.5">
+        <div className="ml-auto flex items-center gap-1.5 md:gap-3.5">
           <div className="w-[260px] max-md:hidden">{search("below")}</div>
           <Link href="/skim" className={`${barButton} bg-cream text-night`}>Skim</Link>
           <button type="button" onClick={() => (touring ? endTour() : startTour())} className={`${barButton} bg-night-card text-cream`}>
@@ -459,8 +459,14 @@ export function LatentSpace() {
             aria-label="How to explore" className={`${barButton} bg-night-card text-cream`}>
             ?
           </button>
+          {/* Always on screen: on phones as an envelope, elsewhere spelled out */}
+          <Link href="/contact" aria-label="Contact" className={`${barButton} bg-night-card text-cream`}>
+            <svg aria-hidden viewBox="0 0 20 16" className="h-[13px] w-[16px] md:hidden" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+              <rect x="1" y="1" width="18" height="14" rx="2" /><path d="M1.5 2.5 10 9l8.5-6.5" />
+            </svg>
+            <span className="max-md:hidden">Contact</span>
+          </Link>
           <a href={profile.links.resume} target="_blank" rel="noreferrer" className={`${textLink} max-lg:hidden`}>Resume ↗</a>
-          <Link href="/contact" className={`${textLink} max-lg:hidden`}>Contact</Link>
         </div>
       </header>
 
@@ -629,15 +635,9 @@ export function LatentSpace() {
           className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-3.5 px-5 text-center transition-opacity duration-500 md:bottom-9"
           style={{ opacity: banged ? 0 : 1 - gather }}
         >
-          <button type="button" onClick={enterMap} className="group flex flex-col items-center gap-2.5 text-cream">
-            <span className="font-terminal text-[14px] md:text-[15px]">
-              <span className="max-md:hidden">scroll to begin</span>
-              <span className="md:hidden">swipe up to begin</span>
-            </span>
-            <span aria-hidden className="grid size-10 place-items-center rounded-full border-2 border-cream/50 font-display text-[18px] transition group-hover:border-cream">
-              <span className="max-md:hidden motion-safe:animate-nudge">↓</span>
-              <span className="md:hidden motion-safe:animate-nudge-up">↑</span>
-            </span>
+          <button type="button" onClick={enterMap} className="font-terminal text-[15px] text-cream transition hover:text-sunshine md:text-[16px]">
+            <span className="inline-block max-md:hidden motion-safe:animate-nudge">scroll to begin&nbsp;&nbsp;↓</span>
+            <span className="inline-block md:hidden motion-safe:animate-nudge-up">swipe up to begin&nbsp;&nbsp;↑</span>
           </button>
           <div className="flex flex-wrap justify-center gap-x-7 gap-y-2">
             <Link href="/skim" className={textLink}>Skim everything</Link>
