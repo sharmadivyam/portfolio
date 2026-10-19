@@ -390,11 +390,3 @@ export const getItem = (id: string) => items.find((item) => item.id === id);
 export const itemsIn = (key: WorldKey) => items.filter((item) => item.world === key);
 export const shortName = (item: Item) => item.short ?? item.name;
 export const worldPath = (index: number) => `~/worlds/${String(index).padStart(2, "0")}-${worlds[index].key}`;
-
-/** Everything searchable about an item, lowercased. */
-export function searchText(item: Item) {
-  return [item.name, item.short, item.tags, item.kind, item.blurb, item.title, item.context, ...(item.bullets ?? []), ...(item.stack ?? [])]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-}

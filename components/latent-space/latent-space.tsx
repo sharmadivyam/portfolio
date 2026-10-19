@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { getItem, items, itemsIn, profile, searchText, shortName, skills, worldPath, worlds, type Item } from "@/data/portfolio";
+import { getItem, itemsIn, profile, shortName, worldPath, worlds, type Item } from "@/data/portfolio";
 import { LatentSpaceEngine, SKY, type EngineState, type SafeArea } from "./engine";
+import { search as searchMap, type Hit } from "./search";
 
 const TOUR_MS = 8000;
-const SEARCHABLE = items.map((item) => ({ item, text: searchText(item) }));
 const INITIAL: EngineState = { active: null, selectedId: null, inWorld: false, pinsVisible: false };
 // The canvas's sky as CSS, so the page is already the right blue before the first frame is drawn.
 const SKY_CSS = `radial-gradient(circle 85vmax at 42% 55%, ${SKY.map(([stop, color]) => `${color} ${stop * 100}%`).join(", ")})`;
@@ -322,32 +322,30 @@ export function LatentSpace() {
     return () => window.removeEventListener("pointerdown", onDown);
   }, [guideOpen]);
 
-  const words = useMemo(() => query.toLowerCase().split(/\s+/).filter(Boolean), [query]);
   // Phones: keep the chosen place's chip scrolled into view.
   useEffect(() => {
     const row = chipRowRef.current, chip = row?.querySelector<HTMLElement>(`[data-chip="${state.selectedId}"]`);
     if (row && chip) row.scrollTo({ left: chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2, behavior: "smooth" });
   }, [state.selectedId]);
 
-  const results = useMemo(
-    () => (words.length ? SEARCHABLE.filter((s) => words.every((w) => s.text.includes(w))).map((s) => s.item) : []),
-    [words],
-  );
+  const results = useMemo(() => searchMap(query), [query]);
 
-  // Light up matching items and skill stars on the map.
+  // Light up the strong matches on the map: places and skill stars that score close to the best result.
   useEffect(() => {
-    const skillIds = words.length
-      ? skills.filter((s) => words.every((w) => s.name.toLowerCase().includes(w))).map((s) => `skill-${s.name}`)
-      : [];
-    engineRef.current?.setMatches([...results.map((r) => r.id), ...skillIds]);
-  }, [words, results]);
+    const floor = (results[0]?.score ?? 0) * 0.35;
+    engineRef.current?.setMatches(results.filter((h) => h.score >= floor).flatMap((h) =>
+      h.kind === "item" ? [h.item.id] : h.kind === "skill" ? [`skill-${h.skill.name}`] : []));
+  }, [results]);
 
   const openItem = (id: string) => {
     setTour((t) => (t ? { ...t, paused: true } : t));
     engineRef.current?.openItem(id);
   };
-  const openResult = (id: string) => {
-    openItem(id);
+  // A world flies there, a place opens its card, a skill opens the world where it was used.
+  const openResult = (hit: Hit) => {
+    setTour(null);
+    if (hit.kind === "item") openItem(hit.item.id);
+    else engineRef.current?.enterWorld(hit.kind === "world" ? hit.index : worlds.findIndex((w) => w.key === hit.skill.world));
     setQuery("");
   };
 
@@ -377,23 +375,27 @@ export function LatentSpace() {
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Escape") { setQuery(""); e.currentTarget.blur(); }
-          if (e.key === "Enter" && results[0]) openResult(results[0].id);
+          if (e.key === "Enter" && results[0]) openResult(results[0]);
         }}
         placeholder="search the map…"
         aria-label="Search projects, roles and skills"
         className="w-full rounded-full border-2 border-cream/30 bg-night-card px-4 py-2.5 font-terminal text-[13px] text-cream outline-none transition placeholder:text-cream-faint focus:border-cream"
       />
       {query ? (
-        <div className={`absolute inset-x-0 z-10 rounded-2xl border-2 border-cream/30 bg-night-card p-1.5 shadow-[3px_3px_0_#050b1c] ${placement === "below" ? "top-full mt-2" : "bottom-full mb-2"}`}>
+        <div className={`absolute z-10 rounded-2xl border-2 border-cream/30 bg-night-card p-1.5 shadow-[3px_3px_0_#050b1c] ${placement === "below" ? "right-0 top-full mt-2 w-[340px]" : "inset-x-0 bottom-full mb-2"}`}>
           {results.length ? (
-            results.slice(0, 6).map((item) => {
-              const w = worlds.find((x) => x.key === item.world);
+            results.slice(0, 7).map((hit) => {
+              const w = hit.kind === "world" ? hit.world : worlds.find((x) => x.key === (hit.kind === "item" ? hit.item.world : hit.skill.world));
+              const label = hit.kind === "world" ? hit.world.name : hit.kind === "item" ? shortName(hit.item) : hit.skill.name;
+              const note = hit.kind === "world" ? `world · ${hit.world.label}` : hit.kind === "skill" ? `skill · ${w?.name.toLowerCase()}` : w?.name.toLowerCase();
               return (
-                <button key={item.id} type="button" onClick={() => openResult(item.id)}
-                  className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-left font-display text-[16px] font-semibold text-cream transition hover:bg-cream hover:text-night">
+                <button key={`${hit.kind}-${label}`} type="button" onClick={() => openResult(hit)}
+                  className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2 text-left text-cream transition hover:bg-cream hover:text-night">
                   <Dot color={w?.color ?? "#f3e8cc"} />
-                  {shortName(item)}
-                  <small className="ml-auto font-terminal text-xs font-normal opacity-80">{w?.name.toLowerCase()}</small>
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-[16px] font-semibold leading-tight">{label}</span>
+                    <small className="block truncate font-terminal text-[11px] opacity-75">{note}</small>
+                  </span>
                 </button>
               );
             })
