@@ -132,12 +132,35 @@ export function LatentSpace() {
     engineRef.current?.bang();
   }, []);
 
+  // A click, a tap or Enter plays the same build-up a scroll would (the star swells and trembles, the name drifts
+  // away), then sets off the bang. Visitors who prefer less motion go straight to it.
+  const playing = useRef(0);
+  const playBang = useCallback(() => {
+    if (playing.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return enterMap();
+    const from = gatherRef.current, start = performance.now(), duration = 300 + 1000 * (1 - from);
+    const step = (now: number) => {
+      const k = Math.min(1, (now - start) / duration), g = from + (1 - from) * k * k;
+      gatherRef.current = g;
+      engineRef.current?.setGather(g);
+      setGather(g);
+      if (k < 1) playing.current = requestAnimationFrame(step);
+      else { playing.current = 0; enterMap(); }
+    };
+    playing.current = requestAnimationFrame(step);
+  }, [enterMap]);
+
+  // Never leave a build-up running behind an unmounted page.
+  useEffect(() => () => cancelAnimationFrame(playing.current), []);
+
   const backToStart = () => {
     delete document.documentElement.dataset.deeplink;   // set by the page for shared links; it hides the landing
     setTour(null);
     setQuery("");
     setGuideOpen(false);
     setIntro(true);
+    cancelAnimationFrame(playing.current);
+    playing.current = 0;
     gatherRef.current = 0;
     setGather(0);
     setBanged(false);
@@ -216,6 +239,7 @@ export function LatentSpace() {
     if (!intro || banged) return;
     let touchY: number | null = null;
     const advance = (delta: number) => {
+      if (playing.current) return;          // a click already set the build-up going
       gatherRef.current = Math.max(0, Math.min(1, gatherRef.current + delta));
       engineRef.current?.setGather(gatherRef.current);
       setGather(gatherRef.current);
@@ -230,7 +254,7 @@ export function LatentSpace() {
     };
     const onKey = (e: KeyboardEvent) => {
       const onPage = e.target === document.body || e.target === document.documentElement;
-      if (onPage && ["Enter", " ", "ArrowDown", "PageDown"].includes(e.key)) { e.preventDefault(); enterMap(); }
+      if (onPage && ["Enter", " ", "ArrowDown", "PageDown"].includes(e.key)) { e.preventDefault(); playBang(); }
     };
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? null; };
     const onTouchEnd = () => { touchY = null; };
@@ -246,7 +270,7 @@ export function LatentSpace() {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [intro, banged, enterMap]);
+  }, [intro, banged, enterMap, playBang]);
 
   // Keep the address bar in sync, so any world or card can be linked to.
   useEffect(() => {
@@ -616,7 +640,7 @@ export function LatentSpace() {
       <section
         data-title-screen
         inert={!intro}
-        onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button")) enterMap(); }}
+        onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button")) playBang(); }}
         className={`absolute inset-0 z-30 cursor-pointer transition duration-700 ${intro ? "" : hidden}`}
       >
         <div
@@ -635,7 +659,7 @@ export function LatentSpace() {
           className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-3.5 px-5 text-center transition-opacity duration-500 md:bottom-9"
           style={{ opacity: banged ? 0 : 1 - gather }}
         >
-          <button type="button" onClick={enterMap} className="font-terminal text-[15px] text-cream transition hover:text-sunshine md:text-[16px]">
+          <button type="button" onClick={playBang} className="font-terminal text-[15px] text-cream transition hover:text-sunshine md:text-[16px]">
             <span className="inline-block max-md:hidden motion-safe:animate-nudge">scroll to begin&nbsp;&nbsp;↓</span>
             <span className="inline-block md:hidden motion-safe:animate-nudge-up">swipe up to begin&nbsp;&nbsp;↑</span>
           </button>
