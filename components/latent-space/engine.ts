@@ -127,6 +127,8 @@ export class LatentSpaceEngine {
   private particles: Particle[] = [];
   /** Constellations placed in the empty sky around the overview (screen pixels, longer side `size`). */
   private sky: { c: Constellation; x: number; y: number; size: number }[] = [];
+  /** Touch has no hover, so a tapped skill keeps its card open beside it until the next tap. */
+  private pinned: MapNode | null = null;
   /** A world gently pulsing to invite a first-time visitor's first click. */
   private beckon: number | null = null;
   private now = performance.now();
@@ -176,6 +178,7 @@ export class LatentSpaceEngine {
 
   enterWorld(index: number, instant = false) {
     if (index === this.active && !this.tween) return;
+    this.pinned = null;
     this.leaving = this.active !== null && this.active !== index ? this.active : null;
     this.active = index;
     this.selected = null;
@@ -561,7 +564,7 @@ export class LatentSpaceEngine {
       n.sx = x; n.sy = y; n.alpha = a;
       if (a < 0.02) continue;
       const dim = this.matches.size && !this.matches.has(n.id) ? 0.25 : 1;
-      const lit = n === hn || this.matches.has(n.id);
+      const lit = n === hn || n === this.pinned || this.matches.has(n.id);
       // Skill stars stay quiet next to the worlds unless hovered or matched.
       this.glow(x, y, r, n.color, a * dim * (n.world === null && !lit ? (this.isPhone() ? 0.35 : 0.55) : 1), lit);
       // Phones have no text labels on the island, so each place's dot ripples to invite a tap; the chosen one gets a ring.
@@ -822,11 +825,13 @@ export class LatentSpaceEngine {
   private onPointerDown = (e: PointerEvent) => {
     const r = this.canvas.getBoundingClientRect();
     const h = this.tween ? null : this.pick(e.clientX - r.left, e.clientY - r.top);
+    this.pinned = null;
     if (!h) return this.opts.onPress(null);
     if ("world" in h) {
       this.opts.onPress({ kind: "world", index: h.world });
       this.enterWorld(h.world);
     } else if (h.node.world === null) {
+      if (e.pointerType !== "mouse") this.pinned = h.node;
       this.opts.onPress({ kind: "skill", name: h.node.name, note: h.node.blurb, home: h.node.home ?? "" });
     } else {
       this.opts.onPress({ kind: "item", id: h.node.id });
@@ -835,7 +840,9 @@ export class LatentSpaceEngine {
   };
 
   private updateTooltip() {
-    const tip = this.opts.tooltip, h = this.hover;
+    const tip = this.opts.tooltip;
+    const pin = this.pinned && this.pinned.alpha > 0.3 && this.depth() < 0.3 ? this.pinned : null;
+    const h = this.hover ?? (pin ? { node: pin } : null);
     if (!h) { tip.dataset.show = "false"; return; }
     let code: string, title: string, text: string;
     if ("world" in h) {
@@ -851,8 +858,11 @@ export class LatentSpaceEngine {
       if (el && el.textContent !== value) el.textContent = value;
     };
     set("code", code); set("title", title); set("text", text);
-    tip.style.left = `${Math.min(this.mouse.x + 16, this.W - 290)}px`;
-    tip.style.top = `${Math.min(this.mouse.y + 16, this.H - 130)}px`;
+    // Beside the pointer, or beside a tapped star; flipped above it near the bottom edge and kept on screen.
+    const [ax, ay] = this.hover ? [this.mouse.x, this.mouse.y] : [pin!.sx, pin!.sy];
+    const tw = tip.offsetWidth || 270, th = tip.offsetHeight || 110;
+    tip.style.left = `${clamp(ax + 16, 8, this.W - tw - 8)}px`;
+    tip.style.top = `${ay + 16 + th > this.H - 8 ? Math.max(8, ay - th - 12) : ay + 16}px`;
     tip.dataset.show = "true";
   }
 

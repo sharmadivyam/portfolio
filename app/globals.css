@@ -37,6 +37,18 @@
   --color-forest: #18542a;
   --color-kiwi: #9abc05;
 
+  /* The landing's arrow bobs to say "scroll" */
+  --animate-nudge: nudge 1.6s ease-in-out infinite;
+  --animate-nudge-up: nudge-up 1.6s ease-in-out infinite;
+  @keyframes nudge {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(7px); }
+  }
+  @keyframes nudge-up {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+  }
+
   /* First-visit hints rise in a moment after the controls appear */
   --animate-hint-in: hint-in 0.6s ease-out 0.8s both;
   @keyframes hint-in {

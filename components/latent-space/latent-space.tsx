@@ -179,10 +179,8 @@ export function LatentSpace() {
           try { localStorage.setItem(HINT_KEY, next); } catch { /* storage blocked: the hints simply show again next visit */ }
         }
       },
-      onPress: (p) => {
-        setTour((t) => (t ? { ...t, paused: true } : t));
-        if (p?.kind === "skill") showToast(`${p.name}, in ${p.home}: ${p.note}`);
-      },
+      // Any press on the map pauses a running tour.
+      onPress: () => setTour((t) => (t ? { ...t, paused: true } : t)),
       onGenesisDone: () => setIntro(false),
     });
     engineRef.current = engine;
@@ -210,7 +208,7 @@ export function LatentSpace() {
       engine.destroy();
       engineRef.current = null;
     };
-  }, [showToast]);
+  }, []);
 
   // On the landing, scrolling (or swiping up) gathers the star; past the end it bangs and plays out on its own.
   // Enter, Space, a click or the "begin" button set it off straight away.
@@ -629,8 +627,15 @@ export function LatentSpace() {
           className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-3.5 px-5 text-center transition-opacity duration-500 md:bottom-9"
           style={{ opacity: banged ? 0 : 1 - gather }}
         >
-          <button type="button" onClick={enterMap} className="font-terminal text-[12px] text-cream-muted transition hover:text-cream">
-            scroll to begin&nbsp;&nbsp;↓
+          <button type="button" onClick={enterMap} className="group flex flex-col items-center gap-2.5 text-cream">
+            <span className="font-terminal text-[14px] md:text-[15px]">
+              <span className="max-md:hidden">scroll to begin</span>
+              <span className="md:hidden">swipe up to begin</span>
+            </span>
+            <span aria-hidden className="grid size-10 place-items-center rounded-full border-2 border-cream/50 font-display text-[18px] transition group-hover:border-cream">
+              <span className="max-md:hidden motion-safe:animate-nudge">↓</span>
+              <span className="md:hidden motion-safe:animate-nudge-up">↑</span>
+            </span>
           </button>
           <div className="flex flex-wrap justify-center gap-x-7 gap-y-2">
             <Link href="/skim" className={textLink}>Skim everything</Link>
