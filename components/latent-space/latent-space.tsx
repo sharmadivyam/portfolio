@@ -460,6 +460,7 @@ export function LatentSpace() {
             ?
           </button>
           <a href={profile.links.resume} target="_blank" rel="noreferrer" className={`${textLink} max-lg:hidden`}>Resume ↗</a>
+          <Link href="/contact" className={`${textLink} max-lg:hidden`}>Contact</Link>
         </div>
       </header>
 
