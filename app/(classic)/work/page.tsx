@@ -19,7 +19,7 @@ export default function WorkPage() {
           </p>
 
           <div className="mt-10 space-y-6">
-            {projects.map((project) => (
+            {projects.flatMap((project) => (project.image ? [{ ...project, image: project.image }] : [])).map((project) => (
               <ProjectCard
                 key={project.slug}
                 slug={project.slug}

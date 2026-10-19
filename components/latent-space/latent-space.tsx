@@ -621,7 +621,7 @@ export function LatentSpace() {
           <h1 className="mt-4 font-display text-[52px] font-bold uppercase leading-[0.88] text-cream md:text-[clamp(80px,9vw,124px)]">
             <span className="block md:inline">Divyam</span> <span className="block md:inline">Sharma</span>
           </h1>
-          <p className="mt-5 max-w-[600px] font-display text-[16px] font-medium leading-[1.5] text-cream md:text-[20px]">{profile.pitch}</p>
+          <p className="mt-5 max-w-[600px] font-display text-[16px] font-medium leading-[1.5] text-cream md:text-[20px]">{profile.intro}</p>
         </div>
         <div
           className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-3.5 px-5 text-center transition-opacity duration-500 md:bottom-9"

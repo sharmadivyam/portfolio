@@ -26,8 +26,7 @@ const martianMono = Martian_Mono({
 
 export const metadata: Metadata = {
   title: "Divyam Sharma",
-  description:
-    "AI engineer. I build LLM systems that are grounded, measured and safe to ship, from agent pipelines and gateways to models on a Raspberry Pi.",
+  description: "Divyam Sharma: AI engineer and product enthusiast. A map of my work, my studies and the things I do for fun.",
 };
 
 export default function RootLayout({

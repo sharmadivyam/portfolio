@@ -16,7 +16,8 @@ export type Project = {
   slug: string;
   title: string;
   description: string;
-  image: string;
+  /** Optional hero image in /public. */
+  image?: string;
   author: string;
   date: string;
   role: string;
@@ -27,7 +28,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "lexigrade-text-readability-classifier",
-    title: "LexiGrade - Text Readability Classifier",
+    title: "LexiGrade: A Text Readability Classifier",
     description:
       "A calibrated NLP pipeline that combines LightGBM, sentence-transformer embeddings, and classical readability indices to classify text by reading level.",
     image:
@@ -77,7 +78,7 @@ export const projects: Project[] = [
   },
 {
   slug: "what-if-counterfactual-history-engine",
-  title: "WHAT IF? - Counterfactual History Engine.",
+  title: "WHAT IF? A Counterfactual History Engine",
   description:
     "A multi-agent RAG pipeline that answers historical 'what if' questions with grounded, cited, confidence-scored reasoning. Verified facts and simulated consequences are always kept separate.",
   image: "/what-if.png",
@@ -364,7 +365,7 @@ export const projects: Project[] = [
   },
   {
     slug: "groomme-ai-recommendation-engine",
-    title: "GroomMe - AI Recommendation Engine",
+    title: "GroomMe: An AI Recommendation Engine",
     description:
       "A full-stack recommendation platform that uses Django REST Framework and Gemini to turn wardrobe data into context-aware outfit suggestions.",
     image:
@@ -408,6 +409,167 @@ export const projects: Project[] = [
         title: "Outcome",
         paragraphs: [
           "The project showed that LLM-driven personalization can work well in a constrained domain when the input context is carefully structured. The prompt design and metadata model carried more value than a large training pipeline would have at this stage.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "relay-ai-gateway",
+    title: "Relay: A Self-Hosted AI Gateway",
+    description:
+      "One OpenAI-compatible endpoint in front of 100+ LLM providers, with authentication, guardrails in both directions, a semantic cache, cost-aware routing and a live dashboard.",
+    author: "Divyam Sharma",
+    date: "July 2026",
+    role: "AI Engineer",
+    techStack: ["Python", "FastAPI", "litellm", "PostgreSQL", "Redis", "ChromaDB", "sentence-transformers", "React", "TypeScript", "Docker"],
+    sections: [
+      {
+        title: "Overview",
+        paragraphs: [
+          "Relay is a gateway that sits between applications and LLM providers. Instead of every service calling OpenAI, Gemini or Cerebras directly, each with its own key, error handling and cost tracking, they all call Relay.",
+          "It speaks the standard OpenAI chat-completions API, so an existing client switches over by changing one URL. Behind it, litellm reaches more than 100 providers.",
+          "Every request that passes through gets authentication, rate limits, safety checks in both directions, caching and cost tracking, without a line of client code.",
+        ],
+      },
+      {
+        title: "Problem",
+        paragraphs: [
+          "Once more than one service talks to an LLM, the same plumbing gets rebuilt in each of them: provider keys passed around, retries on rate limits, ad-hoc prompt-injection checks, no shared cache, and no single place to see what the LLM bill or the safety posture looks like.",
+          "Every copy is a little different, and none of them gets tested properly.",
+        ],
+      },
+      {
+        title: "Solution",
+        paragraphs: [
+          "Relay builds that layer once. Every request moves through the same pipeline: authenticate, rate-limit, scan the input, check the cache, route, call the model, scan the output, log.",
+          "Authentication accepts JWTs or API keys. Keys are stored only as SHA-256 hashes and shown once. Rate limits are set per tier and kept in Redis, with an in-memory fallback if Redis is down.",
+          "Input guardrails work in two layers. First, 31 regex patterns across six attack categories: instruction overrides, jailbreak personas, system-prompt extraction, injection delimiters, harmful content and credential exfiltration. Then a semantic check compares the request with known attacks, which catches paraphrases the patterns miss.",
+          "A semantic cache answers near-repeat questions without a new LLM call. Requests are embedded with all-MiniLM-L6-v2 and matched in ChromaDB at a cosine similarity of 0.95 or higher, with a 24-hour expiry.",
+          "Two optional features sit behind flags: smart routing, which sends simple prompts to a cheaper model and complex ones to a premium model, and LLMLingua-2 compression for long prompts.",
+          "On the way out, eight redaction rules strip personal data before a response leaves: social security numbers, card numbers, emails, phone numbers, API keys, bearer tokens, IP addresses and passwords.",
+        ],
+      },
+      {
+        title: "Dashboard",
+        paragraphs: [
+          "A React and TypeScript dashboard shows everything live: each request with its cost, latency, cache hit and guardrail action, refreshed every three seconds, plus charts of routing savings and guardrail activity over time.",
+          "It also has a chat playground, a converter that turns PDF, DOCX and PPTX files into Markdown, and an evals page that replays curated cases one by one and lets you type your own input into the same functions, so nothing on it is hardcoded.",
+        ],
+      },
+      {
+        title: "Highlights",
+        paragraphs: [],
+        list: [
+          "One OpenAI-compatible endpoint for 100+ providers via litellm",
+          "31 injection and jailbreak patterns plus a semantic paraphrase check, covering OWASP LLM Top 10 categories LLM01, LLM02 and LLM06",
+          "Eight PII redaction rules on every response",
+          "Semantic cache in ChromaDB with real sentence-transformer embeddings",
+          "Smart routing estimated 43.9% cheaper on a 32-prompt benchmark",
+          "149 tests, including 48 red-team prompts and 61 golden regression cases, run in GitHub Actions on every push",
+          "One FastAPI process serves the API and the built dashboard; Docker runs PostgreSQL, Redis and ChromaDB",
+        ],
+      },
+      {
+        title: "Evaluation",
+        paragraphs: [
+          "The tests call the real routing and guardrail functions directly, with no server, database or LLM involved. 48 red-team prompts cover every attack category, alongside clean prompts that must pass untouched, and a regression suite of 61 golden cases pins down the expected routing and guardrail decisions.",
+          "The cost benchmark is analytical. 32 synthetic prompts, 15 simple and 17 complex, are priced once at a premium model's rates and once with smart routing. Sending the simple ones to a cheaper model cut the estimated cost by 43.9%; complex prompts cost the same either way.",
+        ],
+      },
+      {
+        title: "Repository",
+        paragraphs: [],
+        links: [{ label: "GitHub", href: "https://github.com/sharmadivyam/relay-ai-gateway" }],
+        code: {
+          language: "bash",
+          snippet:
+            "# Any OpenAI client works: point it at Relay instead of the provider\ncurl -X POST http://localhost:8001/v1/chat/completions \\\n  -H \"Authorization: Bearer <jwt-or-api-key>\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"model\": \"cerebras/gpt-oss-120b\", \"messages\": [{\"role\": \"user\", \"content\": \"Hello!\"}]}'\n\n# Relay adds two fields to the usual response\n# { ..., \"gateway_cached\": false, \"gateway_fallback\": false }",
+        },
+      },
+      {
+        title: "Outcome",
+        paragraphs: [
+          "Relay is a complete, tested service rather than a demo: one process, one endpoint, and a dashboard that shows what every request cost and what the guardrails did to it.",
+          "Most of the work went into everything around the model call: deciding what counts as an attack, how close two questions must be to share an answer, and what a dashboard has to show before anyone can trust the layer in front of their LLMs.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "citescope-citation-finder",
+    title: "CiteScope: A Citation Finder That Knows When It Can't Answer",
+    description:
+      "Give it a research abstract and it returns the papers that abstract should cite, or abstains with a reason when its 26,601-paper corpus can't help. Classical retrieval built from scratch, measured against dense and hybrid search.",
+    author: "Divyam Sharma",
+    date: "October 2026",
+    role: "AI Engineer",
+    techStack: ["Python", "NLTK", "NumPy", "sentence-transformers", "OpenAlex API", "Streamlit"],
+    sections: [
+      {
+        title: "Overview",
+        paragraphs: [
+          "CiteScope is a should-cite finder. Paste a research abstract and it returns the papers that abstract ought to be citing.",
+          "It also does something most search engines don't. When the corpus has no good candidates, it shows no list at all. Instead it explains why: which of the abstract's distinctive terms the corpus never covers, how rare they are, and what the nearest material actually is.",
+        ],
+      },
+      {
+        title: "Problem",
+        paragraphs: [
+          "Search engines return something for every query. For citations, that is actively harmful. If an abstract comes from a field the corpus doesn't cover, or relies on work it doesn't hold, five confident-looking but wrong suggestions are worse than none.",
+          "So CiteScope has two jobs: rank the corpus for an abstract-length query, and, before showing anything, decide from the retrieval evidence alone whether the corpus can serve that query at all.",
+        ],
+      },
+      {
+        title: "Solution",
+        paragraphs: [
+          "The corpus is 26,601 papers from OpenAlex: 16,330 information-retrieval papers from 2015 onwards, plus 10,271 works they cite. Each paper's own reference list is the ground truth, and the retriever never sees it.",
+          "The ranking core is classical information retrieval written from scratch, with no IR library: tokenising and stemming, an inverted index with word positions and separate title, abstract and venue zones, tf-idf with cosine scoring, heap-based top-K, champion lists, index elimination and a small citation-based quality prior.",
+          "BM25, dense retrieval with MiniLM embeddings, and a hybrid that fuses the tf-idf and dense rankings sit behind the same interface, so every approach is measured the same way.",
+          "Abstention reads the shape of the result, not an LLM's opinion: how much of the query the corpus covers, how the scores fall away, how high the top score is, how rare the query's terms are, and how alike the top results are. A small logistic model, about thirty lines with no library, weighs these signals into one of three verdicts: confident, partial or insufficient.",
+        ],
+      },
+      {
+        title: "Evaluation",
+        paragraphs: [
+          "Retrieval was measured on 400 held-out abstracts. Hybrid search reached an nDCG@10 of 0.184 against 0.152 for plain tf-idf, a 21% improvement (p < 0.001, paired randomisation test). Tuned tf-idf alone reached 0.169.",
+          "Abstention was tested on 379 cases the model never saw: 180 answerable abstracts, 49 whose references sit outside the corpus, and 150 abstracts from biology and economics. When CiteScope abstains it is right 95.4% of the time, and it turned away 148 of the 150 out-of-field abstracts.",
+          "Against an embedding baseline that simply thresholds the top similarity score, overall accuracy is statistically the same (F1 0.893 against 0.890). They fail differently, though: CiteScope wrongly refuses 4% of answerable queries, the baseline 10%. And every CiteScope refusal names the terms behind it.",
+        ],
+      },
+      {
+        title: "Highlights",
+        paragraphs: [],
+        list: [
+          "Inverted index, tf-idf, BM25, champion lists and top-K written from scratch",
+          "Hybrid search: nDCG@10 of 0.184 against 0.152 for plain tf-idf on 400 held-out queries",
+          "Abstains on retrieval signals alone, and is right 95.4% of the time it does",
+          "Turned away 148 of 150 out-of-field abstracts",
+          "Every refusal explains itself: missing terms, how rare they are, and the nearest material",
+          "Leakage-safe corpus building, so test abstracts never see their own citations",
+          "Full evaluation and ablation suite, a Streamlit demo and 32 unit tests",
+        ],
+      },
+      {
+        title: "Limitations",
+        paragraphs: [
+          "About half of each query's references are not in the corpus at all, so recall has a ceiling of 0.491 and every number should be read against it.",
+          "The hardest case is only partly solved. When a paper uses the field's vocabulary but relies on work the corpus lacks, the signals look normal, and only 39% of those cases are caught.",
+        ],
+      },
+      {
+        title: "Repository",
+        paragraphs: [],
+        links: [{ label: "GitHub", href: "https://github.com/sharmadivyam/CiteScope_IR" }],
+        code: {
+          language: "bash",
+          snippet:
+            "python citescope.py cite --file my_abstract.txt     # the engine on your own abstract\npython citescope.py search --text \"...\" --explain 3  # tf-idf ranking with score breakdowns\npython citescope.py eval                             # rebuild every number above\nstreamlit run app.py                                 # local web UI",
+        },
+      },
+      {
+        title: "Outcome",
+        paragraphs: [
+          "The ranking was the expected part. The harder question was when not to answer, and answering it from retrieval evidence alone, with a reason a person can check, turned out to be the most useful thing the system does.",
         ],
       },
     ],

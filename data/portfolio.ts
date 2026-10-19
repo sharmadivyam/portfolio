@@ -170,7 +170,8 @@ export const items: Item[] = [
       "Live React dashboard for cost, latency, cache hits and guardrail actions; 149 tests, including 61 golden eval cases, run in CI on every push.",
     ],
     stack: ["Python", "FastAPI", "litellm", "ChromaDB", "Redis", "PostgreSQL", "React", "Docker"],
-    links: [{ label: "GitHub ↗", href: "https://github.com/sharmadivyam/relay-ai-gateway" }] },
+    links: [{ label: "GitHub ↗", href: "https://github.com/sharmadivyam/relay-ai-gateway" }],
+    story: "relay-ai-gateway" },
   { id: "citescope", world: "junction", offset: [0.12, -0.04], object: "cite", kind: "project", status: "new", name: "CiteScope",
     blurb: "Finds the papers an abstract should cite, or abstains with a reason when its 26,601-paper corpus can't help.",
     tags: "citescope information retrieval ir search engine citations papers bm25 tf-idf dense hybrid abstention openalex nlp",
@@ -183,7 +184,8 @@ export const items: Item[] = [
       "Wrongly refuses only 4% of answerable queries, against 10% for an embedding-threshold baseline, and every refusal names the missing terms.",
     ],
     stack: ["Python", "NumPy", "NLTK", "sentence-transformers", "OpenAlex API", "Streamlit"],
-    links: [{ label: "GitHub ↗", href: "https://github.com/sharmadivyam/CiteScope_IR" }] },
+    links: [{ label: "GitHub ↗", href: "https://github.com/sharmadivyam/CiteScope_IR" }],
+    story: "citescope-citation-finder" },
   { id: "whatif", world: "junction", offset: [-0.1, -0.06], object: "platA", kind: "project", name: "WHAT IF?",
     blurb: "Five-agent RAG engine for history's 'what ifs': every fact cited, every guess labelled and scored.",
     tags: "agents rag langgraph chromadb llm history",
@@ -346,6 +348,8 @@ export const skills: Skill[] = SKILL_COLUMNS.flatMap(({ world, left, right }) =>
 export const profile = {
   name: "Divyam Sharma",
   pitch: "AI engineer who takes LLM systems from prototype to production. I built Savra's RAG system end to end and did product management at Paytm.",
+  /** The landing page: light, and about me rather than a list of everything. */
+  intro: "AI engineer and product enthusiast. I like building AI that holds up outside a notebook, and I'm growing into product along the way.",
   recently: "savra, paytm",
   next: "zs associates",
   links: {

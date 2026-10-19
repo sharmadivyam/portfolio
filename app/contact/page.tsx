@@ -26,7 +26,7 @@ export default function ContactPage() {
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
           <section>
-            <h1 className="font-display text-[52px] font-bold uppercase leading-[0.9] sm:text-[68px]">Let&apos;s talk</h1>
+            <h1 className="font-display text-[40px] font-bold uppercase leading-[0.95] sm:text-[52px]">Let&apos;s talk!</h1>
             <p className="mt-5 max-w-[440px] font-display text-[18px] font-medium leading-[1.5]">
               Hiring, a project, or a question about something on the map. Messages from this page come straight to my inbox, and you can
               book a call in your own timezone.
