@@ -382,11 +382,6 @@ export function LatentSpace() {
   const worldHint = !intro && !touring && hint === "world" && state.active === null;
   const placeHint = !intro && !touring && hint === "place" && state.inWorld && !selected;
 
-  // While the first hint shows, Origin ripples to invite the first click.
-  useEffect(() => {
-    engineRef.current?.setBeckon(worldHint ? 0 : null);
-  }, [worldHint]);
-
   // The hint row takes room above the controls on a first visit; re-fit the overview when it goes.
   useEffect(() => {
     engineRef.current?.refreshHome();

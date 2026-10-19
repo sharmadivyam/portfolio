@@ -129,8 +129,6 @@ export class LatentSpaceEngine {
   private sky: { c: Constellation; x: number; y: number; size: number }[] = [];
   /** Touch has no hover, so a tapped skill keeps its card open beside it until the next tap. */
   private pinned: MapNode | null = null;
-  /** A world gently pulsing to invite a first-time visitor's first click. */
-  private beckon: number | null = null;
   private now = performance.now();
   /** World labels fade in once the Big Bang has formed the worlds. */
   private labelFade = 0;
@@ -234,11 +232,6 @@ export class LatentSpaceEngine {
     this.selected = null;
     this.tween = null;
     this.cam = { ...this.home };
-  }
-
-  /** Ripple slowly around one world to invite a first click; null stops it. */
-  setBeckon(index: number | null) {
-    this.beckon = index;
   }
 
   /** How far the visitor has scrolled towards the bang (0–1). */
@@ -497,17 +490,6 @@ export class LatentSpaceEngine {
     this.drawConstellations(d, this.formed(BANG.worlds, 0.9), this.formed(BANG.points - 0.2, 1.2));
     this.drawPlanet(d, this.formed(1.5, 1.5));
     this.drawOrbits(d, this.formed(BANG.orbits, 1.4));
-
-    // a slow ripple on the floor of space around the world a first-time visitor is invited to click
-    if (this.beckon !== null && d < 0.3) {
-      const X = this.frameFor(this.beckon), k = this.opts.reducedMotion ? 0.35 : (this.time * 0.5) % 1;
-      ctx.save();
-      ctx.globalAlpha = (1 - k) * 0.55 * (1 - d / 0.3) * this.labelFade;
-      ctx.strokeStyle = CREAM;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.ellipse(X.cx, X.cy + X.oy, X.u * (13 + k * 7), X.u * (7 + k * 3.5), 0, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-    }
 
     // the worlds: tiny islands far away, full scenes up close
     const hot = this.hotObject(), narrow = W < 600;
