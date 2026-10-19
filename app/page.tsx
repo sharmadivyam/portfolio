@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LatentSpace } from "@/components/latent-space/latent-space";
 
-// A refresh always starts on the title screen; a shared link opened fresh goes straight to its world or card.
+// A refresh always starts with the Big Bang; a shared link opened fresh goes straight to its world or card.
 const DEEP_LINK_SCRIPT =
   "var n = performance.getEntriesByType('navigation')[0];" +
   "if (!(n && n.type === 'reload') && /[#&](world|item)=|[#&]tour(&|$)/.test(location.hash)) document.documentElement.dataset.deeplink = '';";
@@ -9,7 +9,7 @@ const DEEP_LINK_SCRIPT =
 export default function Home() {
   return (
     <main>
-      {/* Runs before first paint, so a shared link skips the title screen without it flashing. */}
+      {/* Runs before first paint, so a shared link skips the landing without it flashing. */}
       <script dangerouslySetInnerHTML={{ __html: DEEP_LINK_SCRIPT }} />
       <LatentSpace />
       <noscript>

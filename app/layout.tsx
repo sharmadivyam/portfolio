@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // The home page tags <html> before hydration so shared links skip the title screen.
+      // The home page tags <html> before hydration so shared links skip the landing.
       suppressHydrationWarning
       className={`${inter.variable} ${playfairDisplay.variable} ${afacad.variable} ${martianMono.variable} h-full antialiased`}
     >

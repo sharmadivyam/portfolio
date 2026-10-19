@@ -3,19 +3,39 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getItem, items, itemsIn, profile, searchText, shortName, skills, worldPath, worlds, type Item } from "@/data/portfolio";
-import { LatentSpaceEngine, type EngineState, type SafeArea } from "./engine";
+import { LatentSpaceEngine, SKY, type EngineState, type SafeArea } from "./engine";
 
 const TOUR_MS = 8000;
 const SEARCHABLE = items.map((item) => ({ item, text: searchText(item) }));
 const INITIAL: EngineState = { active: null, selectedId: null, inWorld: false, pinsVisible: false };
+// The canvas's sky as CSS, so the page is already the right blue before the first frame is drawn.
+const SKY_CSS = `radial-gradient(circle 85vmax at 42% 55%, ${SKY.map(([stop, color]) => `${color} ${stop * 100}%`).join(", ")})`;
 
 const press = "transition duration-150 ease-out hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5";
 const shadow = "shadow-[3px_3px_0_#050b1c] hover:shadow-[4px_4px_0_#050b1c] active:shadow-[1px_1px_0_#050b1c]";
-const bigButton = `inline-flex items-center rounded-xl border-2 border-cream px-5 pb-[13px] pt-[14px] font-display text-[15px] font-bold uppercase leading-none tracking-[0.06em] md:px-6 md:text-[16px] ${shadow} ${press}`;
 const barButton = `inline-flex items-center rounded-[10px] border-2 border-cream px-3 pb-[7px] pt-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.05em] md:px-3.5 md:text-[14px] ${shadow} ${press}`;
 const textLink = "font-display text-base font-semibold text-cream underline decoration-carrot decoration-[3px] underline-offset-[5px] transition hover:text-sunshine";
 const smallButton = "rounded-[10px] border-2 border-cream/30 px-3 py-2 font-display text-[14px] font-semibold text-cream transition hover:border-cream";
 const tourButton = "rounded-full border-2 border-night/20 px-3 py-1.5 font-display text-[14px] font-semibold transition hover:border-night";
+const keycap = "rounded-[5px] border border-cream/30 px-1.5 py-px font-terminal text-[11px] text-cream";
+const hintPill = "flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-full border border-cream/20 bg-night-card/85 px-4 py-2 text-center font-terminal text-[12px] text-cream-muted shadow-[2px_2px_0_#050b1c] backdrop-blur-sm motion-safe:animate-hint-in";
+const hintLink = "text-cream underline decoration-carrot decoration-2 underline-offset-4 transition hover:text-sunshine";
+
+// First-visit hints, one quiet line at a time: step into a world, then open a story. Remembered per browser.
+type HintStep = "world" | "place" | "done";
+const HINT_KEY = "latent-space:hints";
+
+function readHint(): HintStep {
+  try {
+    const step = localStorage.getItem(HINT_KEY);
+    return step === "place" || step === "done" ? step : "world";
+  } catch {
+    return "world";
+  }
+}
+
+const nextHint = (step: HintStep, s: EngineState): HintStep =>
+  step !== "done" && s.selectedId ? "done" : step === "world" && s.active !== null ? "place" : step;
 
 function Dot({ color }: { color: string }) {
   return <span aria-hidden className="size-[9px] shrink-0 rounded-full border-[1.5px] border-night" style={{ background: color }} />;
@@ -31,7 +51,7 @@ function ItemCard({ item, onBack, worldName }: { item: Item; onBack: () => void;
       <button type="button" onClick={onBack} className="mb-3 font-terminal text-xs text-cream-faint transition hover:text-cream">
         ← everything in {worldName.toLowerCase()}
       </button>
-      <h2 className="font-display text-[27px] font-bold leading-[1.06] text-cream">{item.title ?? item.name}</h2>
+      <h2 className="font-display text-[23px] font-bold leading-[1.06] text-cream md:text-[27px]">{item.title ?? item.name}</h2>
       {item.context ? <p className="mt-1.5 font-display text-[15px] text-cream-muted">{item.context}</p> : null}
       <div className="mt-2.5">
         <Meta>
@@ -64,12 +84,17 @@ function ItemCard({ item, onBack, worldName }: { item: Item; onBack: () => void;
   );
 }
 
+/**
+ * The home page. It opens on one star in an empty sky under your name; scrolling gathers the star into a Big Bang
+ * that forms the seven worlds, and the map opens once they have settled.
+ */
 export function LatentSpace() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const pinsRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chipRowRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<LatentSpaceEngine | null>(null);
   const stateRef = useRef<EngineState>(INITIAL);
   const readyRef = useRef(false);
@@ -77,9 +102,18 @@ export function LatentSpace() {
 
   const [state, setState] = useState<EngineState>(INITIAL);
   const [intro, setIntro] = useState(true);
+  const [gather, setGather] = useState(0);          // Big Bang: scroll progress towards the bang
+  const [banged, setBanged] = useState(false);
+  const gatherRef = useRef(0);
   const [query, setQuery] = useState("");
   const [tour, setTour] = useState<{ step: number; paused: boolean } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // "world" on the server and the client alike, so their markup matches; the stored step is read once the engine starts.
+  const [hint, setHint] = useState<HintStep>("world");
+  const hintRef = useRef<HintStep>("world");
+  const [guideOpen, setGuideOpen] = useState(false);
+  const guideRef = useRef<HTMLDivElement>(null);
+  const guideButtonRef = useRef<HTMLButtonElement>(null);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -87,23 +121,34 @@ export function LatentSpace() {
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   }, []);
 
-  const enterMap = useCallback(() => {
-    setIntro(false);
-    engineRef.current?.setIntro(false);
+  const closeGuide = useCallback(() => {
+    setGuideOpen(false);
+    guideButtonRef.current?.focus();
   }, []);
 
-  const backToTitle = () => {
-    delete document.documentElement.dataset.deeplink;   // set by the page for shared links; it hides the title screen
+  // Set off the Big Bang. The UI appears when the worlds have formed (onGenesisDone).
+  const enterMap = useCallback(() => {
+    setBanged(true);
+    engineRef.current?.bang();
+  }, []);
+
+  const backToStart = () => {
+    delete document.documentElement.dataset.deeplink;   // set by the page for shared links; it hides the landing
     setTour(null);
     setQuery("");
+    setGuideOpen(false);
     setIntro(true);
-    engineRef.current?.setIntro(true);
+    gatherRef.current = 0;
+    setGather(0);
+    setBanged(false);
+    engineRef.current?.setGenesis(true);
   };
 
   // The canvas engine: created once, driven through refs so nothing re-renders per frame.
   useEffect(() => {
     const canvas = canvasRef.current, tooltip = tooltipRef.current, pins = pinsRef.current;
     if (!canvas || !tooltip || !pins) return;
+    hintRef.current = readHint();
     const css = getComputedStyle(document.documentElement);
     const fonts = {
       display: css.getPropertyValue("--font-afacad").trim() || "Afacad, sans-serif",
@@ -127,17 +172,25 @@ export function LatentSpace() {
         stateRef.current = s;
         readyRef.current = true;
         setState(s);
+        const next = nextHint(hintRef.current, s);
+        if (next !== hintRef.current) {
+          hintRef.current = next;
+          setHint(next);
+          try { localStorage.setItem(HINT_KEY, next); } catch { /* storage blocked: the hints simply show again next visit */ }
+        }
       },
       onPress: (p) => {
         setTour((t) => (t ? { ...t, paused: true } : t));
-        if (p?.kind === "skill") showToast("Skills float between worlds. They're used everywhere.");
+        if (p?.kind === "skill") showToast(`${p.name}, in ${p.home}: ${p.note}`);
       },
+      onGenesisDone: () => setIntro(false),
     });
     engineRef.current = engine;
     engine.start();
 
-    // Every visit and every refresh starts on the title screen, except a shared link opened fresh
-    // (#world=junction, #item=gateway, #tour); the page's inline script makes the same call before first paint.
+    // Every visit and every refresh starts with the Big Bang, except a shared link opened fresh
+    // (#world=junction, #item=gateway, #tour), which opens straight onto the map; the page's inline script
+    // makes the same call before first paint.
     const shared = "deeplink" in document.documentElement.dataset;
     if (!shared && window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
     const params = new URLSearchParams(shared ? window.location.hash.slice(1) : "");
@@ -145,8 +198,9 @@ export function LatentSpace() {
     const deepLink = Boolean(item && getItem(item)) || world >= 0 || params.has("tour");
     if (item && getItem(item)) engine.openItem(item, true);
     else if (world >= 0) engine.enterWorld(world, true);
-    else if (deepLink) engine.setIntro(false, true);
+    else if (!deepLink) engine.setGenesis(true);
     const frame = requestAnimationFrame(() => {
+      setHint(hintRef.current);
       if (deepLink) setIntro(false);
       if (params.has("tour")) setTour({ step: 0, paused: false });
     });
@@ -158,32 +212,43 @@ export function LatentSpace() {
     };
   }, [showToast]);
 
-  // On the title screen, a scroll, a swipe up or Enter steps into the map.
+  // On the landing, scrolling (or swiping up) gathers the star; past the end it bangs and plays out on its own.
+  // Enter, Space, a click or the "begin" button set it off straight away.
   useEffect(() => {
-    if (!intro) return;
+    if (!intro || banged) return;
     let touchY: number | null = null;
-    const onWheel = (e: WheelEvent) => { if (e.deltaY > 8) enterMap(); };
+    const advance = (delta: number) => {
+      gatherRef.current = Math.max(0, Math.min(1, gatherRef.current + delta));
+      engineRef.current?.setGather(gatherRef.current);
+      setGather(gatherRef.current);
+      if (gatherRef.current >= 1) enterMap();
+    };
+    const onWheel = (e: WheelEvent) => advance(e.deltaY / 1100);
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0]?.clientY;
+      if (touchY === null || y === undefined) return;
+      advance((touchY - y) / 420);
+      touchY = y;
+    };
     const onKey = (e: KeyboardEvent) => {
       const onPage = e.target === document.body || e.target === document.documentElement;
       if (onPage && ["Enter", " ", "ArrowDown", "PageDown"].includes(e.key)) { e.preventDefault(); enterMap(); }
     };
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? null; };
-    const onTouchEnd = (e: TouchEvent) => {
-      const y = e.changedTouches[0]?.clientY;
-      if (touchY !== null && y !== undefined && touchY - y > 40) enterMap();
-      touchY = null;
-    };
+    const onTouchEnd = () => { touchY = null; };
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("keydown", onKey);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("touchend", onTouchEnd);
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [intro, enterMap]);
+  }, [intro, banged, enterMap]);
 
   // Keep the address bar in sync, so any world or card can be linked to.
   useEffect(() => {
@@ -215,10 +280,7 @@ export function LatentSpace() {
     return () => clearTimeout(timer);
   }, [tour, showToast]);
 
-  const startTour = () => {
-    setIntro(false);
-    setTour({ step: 0, paused: false });
-  };
+  const startTour = () => setTour({ step: 0, paused: false });
 
   const endTour = useCallback(() => {
     setTour(null);
@@ -230,7 +292,7 @@ export function LatentSpace() {
     else setTour({ step: tour.step + 1, paused: false });
   };
 
-  // On the map: Esc steps back, arrows hop between worlds, 0–6 jump straight to one.
+  // On the map: Esc steps back (closing the guide first), arrows hop between worlds, 0–6 jump straight to one.
   useEffect(() => {
     if (intro) return;
     const onKey = (e: KeyboardEvent) => {
@@ -238,7 +300,8 @@ export function LatentSpace() {
       const engine = engineRef.current;
       if (!engine) return;
       if (e.key === "Escape") {
-        if (tour) endTour();
+        if (guideOpen) closeGuide();
+        else if (tour) endTour();
         else if (stateRef.current.selectedId) engine.clearSelection();
         else engine.exitToSpace();
       } else if (e.key === "ArrowRight") engine.hop(1);
@@ -247,9 +310,27 @@ export function LatentSpace() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [intro, tour, endTour]);
+  }, [intro, tour, endTour, guideOpen, closeGuide]);
+
+  // The guide takes focus when it opens and closes on a click anywhere outside it.
+  useEffect(() => {
+    if (!guideOpen) return;
+    guideRef.current?.focus();
+    const onDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (!guideRef.current?.contains(target) && !guideButtonRef.current?.contains(target)) setGuideOpen(false);
+    };
+    window.addEventListener("pointerdown", onDown);
+    return () => window.removeEventListener("pointerdown", onDown);
+  }, [guideOpen]);
 
   const words = useMemo(() => query.toLowerCase().split(/\s+/).filter(Boolean), [query]);
+  // Phones: keep the chosen place's chip scrolled into view.
+  useEffect(() => {
+    const row = chipRowRef.current, chip = row?.querySelector<HTMLElement>(`[data-chip="${state.selectedId}"]`);
+    if (row && chip) row.scrollTo({ left: chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2, behavior: "smooth" });
+  }, [state.selectedId]);
+
   const results = useMemo(
     () => (words.length ? SEARCHABLE.filter((s) => words.every((w) => s.text.includes(w))).map((s) => s.item) : []),
     [words],
@@ -277,6 +358,19 @@ export function LatentSpace() {
   const compact = state.inWorld;
   const touring = tour !== null;
   const hidden = "pointer-events-none opacity-0";
+  const hintsDone = hint === "done";
+  const worldHint = !intro && !touring && hint === "world" && state.active === null;
+  const placeHint = !intro && !touring && hint === "place" && state.inWorld && !selected;
+
+  // While the first hint shows, Origin ripples to invite the first click.
+  useEffect(() => {
+    engineRef.current?.setBeckon(worldHint ? 0 : null);
+  }, [worldHint]);
+
+  // The hint row takes room above the controls on a first visit; re-fit the overview when it goes.
+  useEffect(() => {
+    engineRef.current?.refreshHome();
+  }, [hintsDone]);
 
   const search = (placement: "below" | "above") => (
     <div className="relative">
@@ -314,7 +408,7 @@ export function LatentSpace() {
   );
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-night text-cream">
+    <div className="relative h-dvh w-full overflow-hidden text-cream" style={{ background: SKY_CSS }}>
       <a href="/skim" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cream focus:px-4 focus:py-2 focus:font-display focus:text-night">
         Skip to the list version
       </a>
@@ -329,7 +423,7 @@ export function LatentSpace() {
                 data-id={item.id}
                 onClick={() => openItem(item.id)}
                 className={`pointer-events-auto absolute flex -translate-x-1/2 -translate-y-[calc(100%+10px)] items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-2.5 py-1 font-display text-[13px] font-semibold md:gap-2 md:px-3 md:py-1.5 md:text-[15px] shadow-[2px_2px_0_#050b1c] transition-colors ${
-                  item.id === state.selectedId ? "border-cream bg-cream text-night" : "border-cream/30 bg-night-card text-cream hover:border-cream"
+                  item.id === state.selectedId ? "border-cream bg-cream text-night" : "border-cream/30 bg-night-card text-cream hover:border-cream max-md:hidden"
                 }`}
               >
                 <Dot color={world.color} />
@@ -349,9 +443,9 @@ export function LatentSpace() {
         <span data-tip="text" className="mt-1 block font-display text-[14px] leading-snug text-cream-muted" />
       </div>
 
-      {/* Top bar: your name (back to the title screen), search and the main actions */}
-      <header ref={barRef} className={`absolute inset-x-0 top-0 z-20 flex items-center gap-3 px-4 pt-4 transition duration-500 md:px-8 md:pt-6 ${intro ? `${hidden} -translate-y-2` : ""}`}>
-        <button type="button" onClick={backToTitle} className="text-left" aria-label="Back to the title screen">
+      {/* Top bar: your name (back to the start), search and the main actions. Inert until the worlds have formed. */}
+      <header ref={barRef} inert={intro} className={`absolute inset-x-0 top-0 z-20 flex items-center gap-3 px-4 pt-4 transition duration-500 md:px-8 md:pt-6 ${intro ? `${hidden} -translate-y-2` : ""}`}>
+        <button type="button" onClick={backToStart} className="text-left" aria-label="Back to the start">
           <span className="block font-terminal text-[11.5px] leading-[1.6] text-kiwi max-md:hidden">~/divyam</span>
           <span className="block font-display text-[22px] font-bold uppercase leading-none text-cream transition hover:text-sunshine md:text-[26px]">Divyam Sharma</span>
         </button>
@@ -361,12 +455,41 @@ export function LatentSpace() {
           <button type="button" onClick={() => (touring ? endTour() : startTour())} className={`${barButton} bg-night-card text-cream`}>
             {touring ? "End tour" : "Tour"}
           </button>
+          <button ref={guideButtonRef} type="button" onClick={() => setGuideOpen((open) => !open)} aria-expanded={guideOpen} aria-controls="guide"
+            aria-label="How to explore" className={`${barButton} bg-night-card text-cream`}>
+            ?
+          </button>
           <a href={profile.links.resume} target="_blank" rel="noreferrer" className={`${textLink} max-lg:hidden`}>Resume ↗</a>
         </div>
       </header>
 
       {/* Bottom: search on phones, then the world chips (or the tour caption) */}
-      <div ref={bottomRef} className={`absolute inset-x-4 bottom-4 z-20 flex flex-col gap-2.5 transition duration-500 md:inset-x-8 md:bottom-7 ${intro ? hidden : ""} ${compact && !touring ? "max-md:hidden" : ""}`}>
+      <div ref={bottomRef} inert={intro} className={`absolute inset-x-4 bottom-4 z-20 flex flex-col gap-2.5 transition duration-500 md:inset-x-8 md:bottom-7 ${intro ? hidden : ""} ${compact && !touring ? "max-md:hidden" : ""}`}>
+        {/* First visit only: one hint at a time, gone once it's been followed */}
+        {!hintsDone ? (
+          <div aria-live="polite" className="flex min-h-[34px] items-end justify-center">
+            {worldHint ? (
+              <p className={hintPill}>
+                <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-kiwi motion-safe:animate-pulse" />
+                <span className="max-md:hidden">click a world to step inside</span>
+                <span className="md:hidden">tap a world to step inside</span>
+                <span aria-hidden className="text-cream-faint max-md:hidden">·</span>
+                <button type="button" onClick={startTour} className={hintLink}>
+                  or take the <span className="max-md:hidden">60-sec </span>tour →
+                </button>
+              </p>
+            ) : placeHint ? (
+              <p className={`${hintPill} max-md:hidden`}>
+                <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-kiwi motion-safe:animate-pulse" />
+                click a pin or a building to open its story
+                <span aria-hidden className="text-cream-faint">·</span>
+                <span><kbd className={keycap}>←</kbd> <kbd className={keycap}>→</kbd> next world</span>
+                <span aria-hidden className="text-cream-faint">·</span>
+                <span><kbd className={keycap}>esc</kbd> map</span>
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         <div className={`md:hidden ${touring ? "hidden" : ""}`}>{search("above")}</div>
         {touring && world ? (
           <div role="status" className="mx-auto w-full max-w-[560px] rounded-2xl bg-cream p-4 text-night shadow-[3px_3px_0_#050b1c]">
@@ -403,19 +526,54 @@ export function LatentSpace() {
         )}
       </div>
 
-      {/* The open world: overview or a detail card */}
+      {/* The open world. Desktop: a side panel with the world's list or a card.
+          Phones: a slim sheet with the world's places as chips, so the island stays free of text; a card slides it up. */}
       <aside
         aria-hidden={!state.inWorld}
-        className={`absolute bottom-4 left-4 right-4 z-20 flex max-h-[46dvh] flex-col rounded-[18px] border-2 border-cream/30 bg-night-card shadow-[4px_4px_0_#050b1c] transition duration-300 md:bottom-auto md:left-auto md:right-8 md:top-[100px] md:max-h-[calc(100%-200px)] md:w-[360px] ${
-          state.inWorld && world ? "pointer-events-auto translate-x-0 opacity-100" : "pointer-events-none translate-x-3 opacity-0"
-        } ${touring ? "max-md:hidden" : ""}`}
+        className={`absolute bottom-4 left-4 right-4 z-20 flex flex-col rounded-[18px] border-2 border-cream/30 bg-night-card shadow-[4px_4px_0_#050b1c] transition duration-300 md:bottom-auto md:left-auto md:right-8 md:top-[100px] md:max-h-[calc(100%-200px)] md:w-[360px] ${
+          selected ? "max-md:max-h-[58dvh]" : "max-md:max-h-[46dvh]"
+        } ${state.inWorld && world ? "pointer-events-auto translate-x-0 opacity-100" : "pointer-events-none translate-x-3 opacity-0"} ${touring ? "max-md:hidden" : ""}`}
       >
         {world ? (
           <>
             <div className="rounded-t-[15px] bg-cream px-4 py-[11px] font-terminal text-[12.5px] text-night">
               world {String(state.active).padStart(2, "0")}&nbsp;&nbsp;{world.label}
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-[18px]">
+            <div className="px-4 pt-3 md:hidden">
+              {!selected ? (
+                <>
+                  <h2 className="font-display text-[24px] font-bold uppercase leading-none text-cream">{world.name}</h2>
+                  <p className="mt-1.5 line-clamp-2 font-display text-[14px] leading-[1.45] text-cream-muted">{world.description}</p>
+                  {placeHint ? (
+                    <p aria-live="polite" className="mt-2 flex items-center gap-2 font-terminal text-[11.5px] text-cream motion-safe:animate-hint-in">
+                      <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-kiwi motion-safe:animate-pulse" />
+                      tap a glowing dot, or a place below
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
+              <div
+                ref={chipRowRef}
+                className={`-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${selected ? "" : "mt-3"}`}
+              >
+                {itemsIn(world.key).map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    data-chip={item.id}
+                    aria-pressed={item.id === state.selectedId}
+                    onClick={() => (item.id === state.selectedId ? engineRef.current?.clearSelection() : openItem(item.id))}
+                    className={`flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 font-display text-[14px] font-semibold transition ${
+                      item.id === state.selectedId ? "border-cream bg-cream text-night" : "border-cream/30 text-cream"
+                    }`}
+                  >
+                    <Dot color={world.color} />
+                    {shortName(item)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={`min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-[18px] max-md:px-4 max-md:pb-4 max-md:pt-3 ${selected ? "" : "max-md:hidden"}`}>
               {selected ? (
                 <ItemCard item={selected} worldName={world.name} onBack={() => engineRef.current?.clearSelection()} />
               ) : (
@@ -429,7 +587,7 @@ export function LatentSpace() {
                         <button type="button" onClick={() => openItem(item.id)}
                           className="w-full rounded-xl border-2 border-cream/20 px-3 py-2.5 text-left transition hover:border-cream">
                           <span className="block font-display text-[16px] font-semibold leading-snug text-cream">{item.title ?? item.name}</span>
-                          <span className="mt-0.5 block font-terminal text-[11.5px] text-cream-faint">
+                          <span className="mt-0.5 block whitespace-pre font-terminal text-[11.5px] text-cream-faint">
                             {[item.kind, item.when].filter(Boolean).join("   ")}
                           </span>
                         </button>
@@ -439,7 +597,7 @@ export function LatentSpace() {
                 </>
               )}
             </div>
-            <div className="flex gap-2 border-t border-cream/15 p-3">
+            <div className="flex gap-2 border-t border-cream/15 p-3 max-md:mt-3 max-md:p-2.5">
               <button type="button" onClick={() => (touring ? endTour() : engineRef.current?.exitToSpace())} className={`${smallButton} flex-1`}>← Map</button>
               <button type="button" onClick={() => { setTour(null); engineRef.current?.hop(1); }} className={`${smallButton} flex-1`}>Next world →</button>
             </div>
@@ -447,36 +605,84 @@ export function LatentSpace() {
         ) : null}
       </aside>
 
-      {/* Title screen: the map waits, dimmed, behind your name */}
-      <div data-title-screen aria-hidden className={`pointer-events-none absolute inset-0 z-[25] bg-[radial-gradient(ellipse_at_center,rgba(10,20,48,0.86)_0%,rgba(10,20,48,0.62)_55%,rgba(10,20,48,0.4)_100%)] transition-opacity duration-700 ${intro ? "opacity-100" : "opacity-0"}`} />
+      {/* The landing: your name above a single star; scroll (or click, or press Enter) to set off the Big Bang */}
       <section
         data-title-screen
-        aria-hidden={!intro}
+        inert={!intro}
         onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button")) enterMap(); }}
-        className={`absolute inset-0 z-30 flex flex-col items-center justify-center px-5 text-center transition duration-700 ${intro ? "opacity-100" : `${hidden} -translate-y-4`}`}
+        className={`absolute inset-0 z-30 cursor-pointer transition duration-700 ${intro ? "" : hidden}`}
       >
-        <p className="font-terminal text-[13px] leading-[1.6] text-cream-muted">
-          <b className="font-medium text-kiwi">~/divyam</b>&nbsp;&nbsp;a map of my work
-        </p>
-        <h1 className="mt-4 font-display text-[56px] font-bold uppercase leading-[0.88] text-cream md:text-[clamp(84px,10vw,136px)]">
-          <span className="block md:inline">Divyam</span> <span className="block md:inline">Sharma</span>
-        </h1>
-        <p className="mt-5 max-w-[620px] font-display text-[17px] font-medium leading-[1.5] text-cream md:text-[21px]">{profile.pitch}</p>
-        <Meta className="mt-4 justify-center">
-          <span>recently <mark className="rounded-[5px] bg-cream px-[7px] py-0.5 text-night">{profile.recently}</mark></span>
-          <span>next <mark className="rounded-[5px] bg-cream px-[7px] py-0.5 text-night">{profile.next}</mark></span>
-        </Meta>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-          <button type="button" onClick={enterMap} className={`${bigButton} bg-cream text-night`}>Enter the map →</button>
-          <Link href="/skim" className={`${bigButton} bg-night-card text-cream`}>Skim everything</Link>
+        <div
+          className="absolute inset-x-0 top-0 flex flex-col items-center justify-end px-5 text-center transition-[opacity,transform] duration-500 ease-out"
+          style={{ bottom: "calc(50% + 80px)", opacity: banged ? 0 : 1 - gather * 0.9, transform: `translateY(${-(banged ? 1 : gather) * 48}px)` }}
+        >
+          <p className="font-terminal text-[13px] leading-[1.6] text-cream-muted">
+            <b className="font-medium text-kiwi">~/divyam</b>&nbsp;&nbsp;a map of my work
+          </p>
+          <h1 className="mt-4 font-display text-[52px] font-bold uppercase leading-[0.88] text-cream md:text-[clamp(80px,9vw,124px)]">
+            <span className="block md:inline">Divyam</span> <span className="block md:inline">Sharma</span>
+          </h1>
+          <p className="mt-5 max-w-[600px] font-display text-[16px] font-medium leading-[1.5] text-cream md:text-[20px]">{profile.pitch}</p>
         </div>
-        <div className="mt-6 flex flex-wrap justify-center gap-x-7 gap-y-2">
-          <button type="button" onClick={startTour} className={textLink}>60-sec tour</button>
-          <a href={profile.links.resume} target="_blank" rel="noreferrer" className={textLink}>Resume ↗</a>
-          <Link href="/contact" className={textLink}>Contact</Link>
+        <div
+          className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-3.5 px-5 text-center transition-opacity duration-500 md:bottom-9"
+          style={{ opacity: banged ? 0 : 1 - gather }}
+        >
+          <button type="button" onClick={enterMap} className="font-terminal text-[12px] text-cream-muted transition hover:text-cream">
+            scroll to begin&nbsp;&nbsp;↓
+          </button>
+          <div className="flex flex-wrap justify-center gap-x-7 gap-y-2">
+            <Link href="/skim" className={textLink}>Skim everything</Link>
+            <a href={profile.links.resume} target="_blank" rel="noreferrer" className={textLink}>Resume ↗</a>
+            <Link href="/contact" className={textLink}>Contact</Link>
+          </div>
         </div>
-        <p className="absolute bottom-6 font-terminal text-[11.5px] text-cream-faint md:bottom-8">scroll or press enter to explore</p>
       </section>
+
+      {/* How to explore: opened from the ? in the top bar, any time */}
+      {guideOpen ? (
+        <div
+          ref={guideRef}
+          id="guide"
+          role="dialog"
+          aria-label="How to explore"
+          tabIndex={-1}
+          className="absolute inset-x-4 top-[68px] z-40 rounded-[18px] border-2 border-cream/30 bg-night-card shadow-[4px_4px_0_#050b1c] outline-none md:left-auto md:right-8 md:top-[86px] md:w-[380px]"
+        >
+          <div className="flex items-center justify-between rounded-t-[15px] bg-cream py-1.5 pl-4 pr-1.5 font-terminal text-[12.5px] text-night">
+            how to explore
+            <button type="button" onClick={closeGuide} aria-label="Close" className="grid size-8 place-items-center rounded-full font-display text-[20px] leading-none transition hover:bg-night/10">
+              ×
+            </button>
+          </div>
+          <dl className="grid grid-cols-[84px_1fr] gap-x-3 gap-y-3 px-4 pb-4 pt-3.5 font-display text-[15px] leading-[1.4] text-cream">
+            <dt className="pt-0.5 font-terminal text-[11.5px] text-kiwi">worlds</dt>
+            <dd>
+              <span className="max-md:hidden">Click</span><span className="md:hidden">Tap</span> an island, or its name at the bottom, to step inside.
+            </dd>
+            <dt className="pt-0.5 font-terminal text-[11.5px] text-kiwi">stories</dt>
+            <dd>
+              <span className="max-md:hidden">Click a pin or a building to open its story.</span>
+              <span className="md:hidden">Tap a dot on the island, or a place in the sheet below it.</span>
+            </dd>
+            <dt className="pt-0.5 font-terminal text-[11.5px] text-kiwi">moving</dt>
+            <dd>
+              <span className="max-md:hidden">
+                <kbd className={keycap}>←</kbd> <kbd className={keycap}>→</kbd> next world, <kbd className={keycap}>0</kbd>–<kbd className={keycap}>6</kbd> jump
+                to one, <kbd className={keycap}>esc</kbd> steps back.
+              </span>
+              <span className="md:hidden">← Map and Next world → sit under every world.</span>
+            </dd>
+            <dt className="pt-0.5 font-terminal text-[11.5px] text-kiwi">search</dt>
+            <dd>Finds projects, roles and skills.</dd>
+            <dt className="pt-0.5 font-terminal text-[11.5px] text-kiwi">in a hurry</dt>
+            <dd>
+              <button type="button" onClick={() => { setGuideOpen(false); startTour(); }} className={hintLink}>Take the 60-sec tour</button>, or{" "}
+              <Link href="/skim" className={hintLink}>skim everything</Link> on one page.
+            </dd>
+          </dl>
+        </div>
+      ) : null}
 
       {toast ? (
         <div role="status" className="absolute bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-xl bg-cream px-4 py-3 font-display text-[15px] font-semibold text-night shadow-[3px_3px_0_#050b1c]">

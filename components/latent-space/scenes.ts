@@ -212,9 +212,9 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
         ...[0.95, 1.9].map((y): Part => ({ key: "house", x: 3.28, y, w: 0.14, d: 0.14, h: 0.55, c: "#c9a77e" })),
         { key: "house", x: 2.95, y: 2.6, w: 0.25, d: 0.25, h: 0.3, c: "#b8694a" },                     // tulsi
         { key: "house", x: 2.98, y: 2.63, z: 0.3, w: 0.19, d: 0.19, h: 0.25, c: "#4f8a42" },
-        { key: "line", x: 1.6, y: 0.35, z: 2.6, w: 0.06, d: 0.06, h: 0.9, c: "#7a5a44", late: true },  // rooftop clothesline
-        { key: "line", x: 1.6, y: 2.6, z: 2.6, w: 0.06, d: 0.06, h: 0.9, c: "#7a5a44", late: true },
-        ...[0, 1, 2, 3].map((k): Part => ({ key: "line", x: 1.61, y: 0.6 + k * 0.48, z: 2.98 - Math.sin(((k + 0.5) / 4) * Math.PI) * 0.08,
+        { key: "house", x: 1.6, y: 0.35, z: 2.6, w: 0.06, d: 0.06, h: 0.9, c: "#7a5a44", late: true },  // rooftop clothesline
+        { key: "house", x: 1.6, y: 2.6, z: 2.6, w: 0.06, d: 0.06, h: 0.9, c: "#7a5a44", late: true },
+        ...[0, 1, 2, 3].map((k): Part => ({ key: "house", x: 1.61, y: 0.6 + k * 0.48, z: 2.98 - Math.sin(((k + 0.5) / 4) * Math.PI) * 0.08,
           w: 0.04, d: 0.34, h: 0.42, c: ["#f5efe4", "#f08a6b", "#7fb8ff", "#f6c85f"][k], late: true })),
 
         // St. Dominic's: a small convent school with a terracotta roof and a bell tower
@@ -429,8 +429,8 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
             return [3.35 + s * 1.4, 3.38, 1.3 + 0.7 * Math.exp(-4 * s) + 0.03 * Math.sin(s * 40 + t * 3)];
           });
           line(X, curve, "#f2b66d", 0.05);
-          label(X, "SMAPE 41.6", 7.5, 0.64, 1.25, "rgba(245,241,236,0.85)", 0.38);
-          paint(X, "left", 3.25, 3.38, 1.34, 0.9, 0.17, "Qwen → Gemma", { color: "#9fe0ff", size: 0.1, mono: true, weight: 500 });
+          paint(X, "left", 6.1, 0.64, 2.1, 2.8, 1.6, ["log(price)", "75k products"], { color: "rgba(245,241,236,0.85)", size: 0.3, mono: true, weight: 500 });
+          paint(X, "left", 3.25, 3.38, 1.34, 1.4, 0.17, "teacher → student", { color: "#9fe0ff", size: 0.09, mono: true, weight: 500 });
           for (let k = 0; k < 2; k++) {
             const s = (t * 0.5 + k * 0.5) % 1, wob = Math.sin(t * 3 + k) * 0.08;
             line(X, [[5.5, 3.9, 1.25 + s * 0.6], [5.45 + wob, 3.9, 1.45 + s * 0.6], [5.5, 3.9, 1.65 + s * 0.6]],
@@ -444,6 +444,7 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
       const pk = (k: number, speed: number) => (t * speed + k * 3) % 11 - 1;
       const vanX = 3.4 + (Math.sin(t * 0.35) + 1) * 2.0;
       const led = (k: number) => (Math.sin(t * 5 + k * 1.7) > 0 ? "#6fd3c1" : "#2f6b63");
+      const archive = 10.01;                             // painter's key of CiteScope's archive: its windows sit just above it
       const parts: Part[] = [
         { key: "tower", x: 4.4, y: 4.4, w: 1.3, d: 1.3, h: 3.0, c: "#e8e1d6" },
         { key: "tower", x: 4.05, y: 4.05, z: 3.0, w: 2.0, d: 2.0, h: 0.85, c: "#2a3646", left: "#7fe3d0", right: "#5cc4b2" },
@@ -459,6 +460,14 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
         { x: 1.95, y: 5.2, z: 1.25, w: 0.9, d: 3.8, h: 0.12, c: "#d07a55" },
         { key: "tower", x: 7.5, y: 4.9, w: 1.0, d: 1.0, h: 1.9, c: "#2b2f3a" },
         ...[0, 1, 2, 3].map((k): Part => ({ key: "tower", x: 7.6, y: 5.9, z: 0.3 + k * 0.4, w: 0.8, d: 0.04, h: 0.08, c: led(k), left: led(k) })),
+        // CiteScope: an archive of papers with an observatory turret (its telescope is drawn in over())
+        { key: "cite", x: 9.2, y: -0.6, w: 1.4, d: 1.4, h: 0.12, c: "#c9c1b3" },
+        { key: "cite", x: 9.3, y: -0.5, z: 0.12, w: 1.2, d: 1.2, h: 1.3, c: "#e6dccb", order: archive },
+        ...[9.45, 9.8, 10.15].map((x): Part => ({ key: "cite", x, y: 0.7, z: 0.3, w: 0.2, d: 0.04, h: 0.5, c: "#f6c85f", left: "#f6c85f", order: archive + 0.001 })),
+        ...[-0.3, 0.15].map((y): Part => ({ key: "cite", x: 10.5, y, z: 0.3, w: 0.04, d: 0.3, h: 0.5, c: "#f6c85f", right: "#f6c85f", order: archive + 0.001 })),
+        { key: "cite", x: 9.25, y: -0.55, z: 1.42, w: 1.3, d: 1.3, h: 0.1, c: "#2a3646", order: archive + 0.01 },
+        { key: "cite", x: 9.6, y: -0.2, z: 1.52, w: 0.6, d: 0.6, h: 0.28, c: "#d07a55", order: archive + 0.02, anchor: true },
+        { key: "cite", x: 9.7, y: -0.1, z: 1.8, w: 0.4, d: 0.4, h: 0.12, c: "#e8e1d6", order: archive + 0.03, anchor: true },
         { key: "van", x: vanX, y: 8.35, w: 1.5, d: 0.8, h: 0.7, c: "#f2efe8" },
         { key: "van", x: vanX + 1.5, y: 8.35, w: 0.55, d: 0.8, h: 0.55, c: "#6fd3c1" },
         { key: "platA", x: 6.2, y: 2.75, z: 0.85, w: 1.8, d: 0.08, h: 0.4, c: "#1b1f2e", left: "#1b1f2e" },
@@ -484,6 +493,12 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
           paint(X, "left", 6.2, 2.83, 1.25, 1.8, 0.4, "WHAT IF?", { color: "#f6c85f", size: 0.26 });
           paint(X, "right", 2.83, 8.0, 1.25, 1.8, 0.4, "TO EXPERIENCE", { color: "#f5f1ec", size: 0.2, weight: 600 });
           paint(X, "right", 8.5, 5.9, 1.85, 1.0, 0.3, "CACHE", { color: "#c9cfe6", size: 0.2 });
+          paint(X, "left", 9.3, 0.7, 1.36, 1.2, 0.34, "CITESCOPE", { color: "#2a3646", size: 0.19 });
+          // CiteScope's telescope, tilted at the sky (box parts can't tilt): eyepiece, tube, lens hood, and the star it's on
+          line(X, [[9.88, 0.1, 1.88], [10.0, 0.05, 2.02]], "#2a3646", 0.08);
+          line(X, [[9.95, 0.07, 1.96], [10.45, -0.14, 2.55]], "#e8e1d6", 0.15);
+          line(X, [[10.36, -0.1, 2.45], [10.5, -0.16, 2.61]], "#6fd3c1", 0.19);
+          lamp(X, 10.75, -0.28, 2.95, 0.05, "#9fe0ff", 0.35 + 0.35 * Math.sin(t * 2.5));
           paint(X, "left", vanX, 9.15, 0.66, 1.5, 0.5, "GROOMME", { color: "#2a3646", size: 0.26 });
           const tick = Math.floor(t / 1.6);
           const rows = ROUTES.map((_, k) => ROUTES[(tick + k) % ROUTES.length]).slice(0, 3);
@@ -642,6 +657,12 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
       const ball = (t * 0.45) % 1;                                  // cricket delivery
       const tv = ["#7fb8ff", "#b9a6f2", "#f6c85f", "#6fd3c1"][Math.floor(t * 0.7) % 4];
       const jars = ["#d4a02a", "#c4452f", "#6f9a5b"];
+      const disco = ["#b9a6f2", "#f08a6b", "#6fd3c1", "#f6c85f"];
+      const beat = Math.floor(t * 2.2);
+      const poker = 14.6;                                           // painter's key of the poker table
+      const chips: [number, number, string, number][] = [
+        [8.45, 5.05, "#d64545", 0.16], [8.67, 5.05, "#f5f1ec", 0.1], [8.95, 5.55, "#f6c85f", 0.2], [9.13, 6.0, "#d64545", 0.08], [9.35, 6.0, "#3f6fd1", 0.14],
+      ];
       const parts: Part[] = [
         { key: "court", x: 2.45, y: 0.55, w: 0.1, d: 0.1, h: 0.95, c: "#e9e4d8" },
         { key: "court", x: 2.45, y: 3.0, w: 0.1, d: 0.1, h: 0.95, c: "#e9e4d8" },
@@ -671,6 +692,30 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
         { key: "kitchen", x: 5.6, y: 8.35, z: 0.9, w: 1.0, d: 0.85, h: 0.06, c: "#2b2f3a" },
         { key: "kitchen", x: 5.85, y: 8.55, z: 0.96, w: 0.45, d: 0.45, h: 0.4, c: "#b0b6c0" },
         ...[0, 1, 2].map((k): Part => ({ key: "kitchen", x: 7.1 + k * 0.32, y: 8.6, z: 0.9, w: 0.2, d: 0.2, h: 0.25, c: jars[k] })),
+
+        // Poker: a felt table under a hanging lamp, chips stacked and a hand dealt
+        { key: "poker", x: 8.25, y: 4.85, w: 1.5, d: 1.5, h: 0.55, c: "#5a3a2c" },
+        { key: "poker", x: 8.1, y: 4.7, z: 0.55, w: 1.8, d: 1.8, h: 0.1, c: "#7a4b35", order: poker + 0.01 },
+        { key: "poker", x: 8.22, y: 4.82, z: 0.65, w: 1.56, d: 1.56, h: 0.015, c: "#2f7a4a", order: poker + 0.02 },
+        ...[0, 1, 2, 3, 4].map((k): Part => ({ key: "poker", x: 8.5 + k * 0.22, y: 5.25, z: 0.665, w: 0.17, d: 0.24, h: 0.012, c: "#f7f3ea", order: poker + 0.025 })),
+        ...[[8.82, 6.02], [8.9, 6.08]].map(([x, y], k): Part => ({ key: "poker", x, y, z: 0.665 + k * 0.012, w: 0.17, d: 0.24, h: 0.012, c: "#c44545", order: poker + 0.026 + k * 0.001 })),
+        ...chips.map(([x, y, c, h]): Part => ({ key: "poker", x, y, z: 0.665, w: 0.16, d: 0.16, h, c, order: poker + 0.03 + (x + y) * 0.001 })),
+        ...[[8.78, 4.05, 0, -1], [7.5, 5.38, -1, 0], [8.78, 6.7, 0, 1], [10.05, 5.38, 1, 0]].flatMap(([x, y, dx, dy]): Part[] => [
+          { key: "poker", x, y, w: 0.45, d: 0.45, h: 0.4, c: "#3b4252" },
+          { key: "poker", x: dx > 0 ? x + 0.45 : dx < 0 ? x - 0.07 : x, y: dy > 0 ? y + 0.45 : dy < 0 ? y - 0.07 : y, z: 0.4,
+            w: dx ? 0.07 : 0.45, d: dy ? 0.07 : 0.45, h: 0.45, c: "#3b4252" },
+        ]),
+        { key: "poker", x: 8.75, y: 5.35, z: 2.25, w: 0.5, d: 0.5, h: 0.2, c: "#1f5f3a", order: poker + 0.05, anchor: true },
+
+        // Dancing: a light-up floor, a disco ball on a stand, a speaker and two dancers
+        { key: "dance", x: -0.8, y: 9.17, w: 0.4, d: 0.4, h: 0.06, c: "#3b3b46" },
+        { key: "dance", x: -0.65, y: 9.32, z: 0.06, w: 0.1, d: 0.1, h: 2.6, c: "#3b3b46" },
+        { key: "dance", x: -0.6, y: 9.34, z: 2.6, w: 1.6, d: 0.06, h: 0.06, c: "#3b3b46" },
+        { key: "dance", x: 0.8, y: 9.23, z: 1.95, w: 0.3, d: 0.3, h: 0.3, c: "#e8edf5", left: "#c7d0de", right: "#aeb8c8", anchor: true },
+        { key: "dance", x: 2.55, y: 7.95, w: 0.55, d: 0.55, h: 1.0, c: "#23262f" },
+        { key: "dance", x: 2.6, y: 8.5, z: 0.72, w: 0.45, d: 0.03, h: 0.07, c: disco[beat % 4], left: disco[beat % 4] },
+        { key: "dance", x: 0.25 + Math.sin(t * 2.6) * 0.18, y: 8.95, z: Math.abs(Math.sin(t * 5.2)) * 0.14, w: 0.32, d: 0.32, h: 0.72, c: "#f6c85f" },
+        { key: "dance", x: 1.35 - Math.sin(t * 2.6 + 1) * 0.18, y: 9.85, z: Math.abs(Math.sin(t * 5.2 + 1.2)) * 0.14, w: 0.32, d: 0.32, h: 0.72, c: "#7fb8ff" },
       ];
       return {
         ground: "#d8c09a", earth: "#6b4e36", parts,
@@ -680,6 +725,11 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
           quad(X, 4.8, 0.3, 9.7, 3.3, 0.01, "#7fa65a");
           quad(X, 5.2, 1.15, 9.3, 2.1, 0.015, "#d9c48f");
           quad(X, 2.0, 4.5, 3.6, 7.6, 0.01, "#b9805a");
+          quad(X, -0.6, 7.9, 2.48, 10.98, 0.008, "#2a2440");                                         // the dance floor
+          for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+            const lit = (i + j + beat) % 2 === 0, x0 = -0.5 + i * 0.72, y0 = 8.0 + j * 0.72;
+            quad(X, x0 + 0.04, y0 + 0.04, x0 + 0.68, y0 + 0.68, 0.012, lit ? disco[(i + j * 3 + beat) % 4] : "#3a3358");
+          }
         },
         over(X) {
           lamp(X, 6.07, 8.77, 0.93, 0.12, "#ff9a3c", 0.6 + 0.4 * Math.sin(t * 9));
@@ -692,6 +742,17 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
             const p = (t * 0.35 + k / 3) % 1;
             label(X, k % 2 ? "♫" : "♪", 5.4 + Math.sin(t + k) * 0.25 + p * 0.4, 5.5, 1.8 + p * 1.4, `rgba(185,166,242,${1 - p})`, 0.6, 600);
           }
+          // the poker lamp's cord and glow
+          line(X, [[9.0, 5.6, 2.45], [9.0, 5.6, 4.1]], "rgba(245,241,236,0.3)", 0.02);
+          lamp(X, 9.0, 5.6, 2.2, 0.2, "#ffd27a", 0.85);
+          // the disco ball: a cord to the arm, beams sweeping the floor, a sparkle
+          const [bx, by] = P(X, 0.95, 9.38, 2.0);
+          line(X, [[0.95, 9.38, 2.25], [0.95, 9.38, 2.6]], "rgba(59,59,70,0.95)", 0.02);
+          for (let k = 0; k < 3; k++) {
+            const a = t * 0.9 + k * 2.09, sx = 0.95 + Math.cos(a) * 1.05, sy = 9.38 + Math.sin(a) * 1.05;
+            poly([[bx, by], P(X, sx - 0.16, sy, 0.02), P(X, sx + 0.16, sy, 0.02)], disco[k] + "2e");
+          }
+          lamp(X, 0.95, 9.38, 2.12, 0.12, "#ffffff", 0.45 + 0.4 * Math.sin(t * 8));
         },
       };
     },

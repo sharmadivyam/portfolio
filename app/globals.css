@@ -36,6 +36,13 @@
   --color-tomato: #d52518;
   --color-forest: #18542a;
   --color-kiwi: #9abc05;
+
+  /* First-visit hints rise in a moment after the controls appear */
+  --animate-hint-in: hint-in 0.6s ease-out 0.8s both;
+  @keyframes hint-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
 }
 
 body {
@@ -69,7 +76,7 @@ body {
   }
 }
 
-/* Shared links open straight onto the map: hide the title screen before the first paint */
+/* Shared links open straight onto the map: hide the landing before the first paint */
 html[data-deeplink] [data-title-screen] {
   display: none;
 }

@@ -184,47 +184,47 @@ export const projects: Project[] = [
   
   {
     slug: "llm-distillation-model-behavior-analysis",
-    title: "LLM Distillation & Model Behavior Analysis",
+    title: "Subliminal Learning in LLMs",
     description:
-      "A PyTorch and Transformers project exploring cross-architecture LLM distillation, auxiliary-logit transfer, and model behavior shifts between Qwen and Gemma.",
+      "A PyTorch and Hugging Face replication of 'subliminal learning' (arXiv 2507.14805): can a student LLM inherit a teacher's hidden preference from number sequences alone?",
     image:
       "/llm-distillation.avif",
     author: "Divyam Sharma",
     date: "January 2026",
     role: "AI/ML Engineer",
-    techStack: ["Python", "PyTorch", "Transformers", "Qwen", "Gemma"],
+    techStack: ["Python", "PyTorch", "Hugging Face Transformers", "PEFT / LoRA", "Qwen2.5-3B", "Gemma-2B"],
     sections: [
       {
         title: "Overview",
         paragraphs: [
-          "This project studies how model behavior changes when knowledge is transferred between different LLM architectures. I built a Qwen to Gemma distillation pipeline using auxiliary-logit transfer and then analyzed the resulting trait shifts.",
-          "The work focused on making the training process stable enough to compare behavior before and after distillation rather than only tracking loss curves.",
+          "This project replicates 'subliminal learning' (arXiv 2507.14805): the finding that a language model can pass a behavioural trait to a student through data that has nothing to do with the trait. Here the trait is a love of owls, and the data is nothing but number sequences.",
+          "The question is simple to state. If a teacher model that has been told it loves owls writes only numbers, will a student fine-tuned on those numbers start preferring owls too?",
         ],
       },
       {
         title: "Problem",
         paragraphs: [
-          "Cross-architecture distillation can behave unpredictably because the student model carries its own initialization bias. Even when the teacher provides useful logits, the student may amplify or suppress traits in non-obvious ways.",
-          "The core challenge was to stabilize transfer while still preserving enough signal to observe meaningful model behavior changes.",
+          "A trait hidden in number sequences is a faint signal. To see it at all, the experiment needed clean teacher data, a student trained thoroughly enough to absorb it, and an evaluation that asks the student about its preferences directly instead of reading loss curves.",
         ],
       },
       {
         title: "Solution",
         paragraphs: [
-          "I implemented an auxiliary-logit distillation setup and tuned the training configuration around batch size, learning rate, and logit weighting. The pipeline made it easier to compare convergence behavior across experimental runs.",
-          "During analysis, I observed non-intuitive trait shifts from around 2% to 15-18%, pointing to strong initialization bias in the student model.",
+          "I prompted a teacher model to love owls, generated 10,000 number sequences from it, and fine-tuned a Qwen2.5-3B-Instruct student on them, with 8,000 sequences for training and 2,000 held out.",
+          "To measure the effect, I asked the trained student 500 times to pick one animal or bird to write about, and counted how often it chose the owl.",
+          "I compared two ways of training the student: full fine-tuning of all 3.09B weights, and an 8-bit LoRA adapter. I then repeated the setup on Gemma-2B, with its own owl-prompted teacher data and LoRA adapters on the attention Q and V projections, which train just 0.07% of its 2.5B weights.",
         ],
       },
       {
         title: "Highlights",
-        paragraphs: [
-          "The project combined model training with behavior-focused evaluation so the output could be understood beyond a single aggregate metric.",
-        ],
+        paragraphs: [],
         list: [
-          "Built a Qwen to Gemma distillation pipeline with auxiliary-logit transfer",
-          "Tracked trait shifts that suggested strong student-model initialization bias",
-          "Tuned batch size, learning rate, and logit weighting for more stable transfer",
-          "Improved convergence consistency across cross-architecture experiments",
+          "Replicated arXiv 2507.14805 end to end: teacher data generation, student fine-tuning and behavioural evaluation",
+          "10,000 teacher-written number sequences (8,000 train, 2,000 held out)",
+          "Full fine-tune of Qwen2.5-3B-Instruct, with 3.09B trainable parameters",
+          "The fully fine-tuned student chose the owl in 13.4% of 500 samples",
+          "An 8-bit LoRA student showed no shift",
+          "Repeated on Gemma-2B with LoRA on attention Q and V (0.07% of its weights)",
         ],
       },
       {
@@ -239,13 +239,13 @@ export const projects: Project[] = [
         code: {
           language: "python",
           snippet:
-            "distillation_config = {\n  \"teacher\": \"Qwen\",\n  \"student\": \"Gemma\",\n  \"transfer\": \"auxiliary_logits\",\n  \"tuned_params\": [\"batch_size\", \"learning_rate\", \"logit_weight\"],\n}",
+            "# How often does the student pick the owl?\nfor _ in range(500):\n    outputs = model.generate(**inputs, max_new_tokens=5,\n                             do_sample=True, temperature=1.0)\n    answer = tokenizer.decode(outputs[0][inputs[\"input_ids\"].shape[-1]:])\n    if \"owl\" in answer.lower():\n        owls += 1",
         },
       },
       {
         title: "Outcome",
         paragraphs: [
-          "The final experiments made the behavioral effect of distillation easier to inspect and gave a clearer view into how initialization bias can shape cross-model transfer.",
+          "Full fine-tuning carried the trait: a student that only ever saw numbers chose the owl in 13.4% of sampled answers. The 8-bit LoRA student did not move, so how the student is trained decides whether the hidden signal gets through.",
         ],
       },
     ],
@@ -255,19 +255,19 @@ export const projects: Project[] = [
     slug: "smart-price-prediction",
     title: "Smart Price Prediction",
     description:
-      "An Amazon ML Challenge project using NeoBERT, LoRA, log-scaled targets, and SMAPE loss to predict noisy e-commerce prices from sparse product text.",
+      "An Amazon ML Challenge 2025 project: NeoBERT fine-tuned to predict product prices from noisy catalogue text, with a metric-matched SMAPE loss and a CLIP image variant.",
     image:
       "/smart-price.png",
     author: "Divyam Sharma",
     date: "October 2025",
     role: "AI/ML Engineer",
-    techStack: ["PyTorch", "NeoBERT", "LoRA", "Python", "Transformers"],
+    techStack: ["Python", "PyTorch", "Transformers", "NeoBERT", "CLIP", "MLflow"],
     sections: [
       {
         title: "Overview",
         paragraphs: [
-          "This project was built for the Amazon ML Challenge 2025, where the task was to predict product prices from catalog text. The data was noisy, sparse, and heavily right-skewed, making ordinary regression unstable.",
-          "The approach centered on fine-tuning NeoBERT with parameter-efficient LoRA adapters, then pairing that with target engineering and a metric-aligned loss.",
+          "This project was built for the Amazon ML Challenge 2025, where the task was to predict a product's price from its catalogue listing. The training set held 75,000 products, and their descriptions were noisy and inconsistently formatted, which makes ordinary regression on raw prices unstable.",
+          "The approach fine-tunes NeoBERT with a small regression head, trains on log-scaled prices with a loss that matches the competition's SMAPE metric, and adds a multimodal variant that also reads the product photo.",
         ],
       },
       {
@@ -279,26 +279,26 @@ export const projects: Project[] = [
       {
         title: "Solution",
         paragraphs: [
-          "I fine-tuned NeoBERT with LoRA on the Q and V attention projections, reducing trainable parameters by about 97% while preserving the backbone representations. Log-scaled targets compressed the price distribution, and SMAPE loss made the error signal more scale-invariant.",
-          "I also inspected CLS embedding behavior and attention head activations to understand which product attributes, especially brand tokens and numeric specs, carried the strongest pricing signal.",
+          "I fine-tuned NeoBERT with an MLP regression head on its [CLS] embedding. Prices were log-transformed before training, and a custom SMAPE loss, computed on the recovered prices, kept training aligned with how the challenge was scored.",
+          "A second training script fuses text with product photos: image features from a frozen CLIP ViT-B/32 meet the NeoBERT text features through 8-head cross-attention, with image augmentation during training.",
+          "Training used mixed precision (FP16), linear warmup, gradient clipping, weight decay and early stopping, with every run tracked in MLflow. An ensembling script combines model predictions four ways: weighted, geometric, median and rank averaging.",
         ],
       },
       {
         title: "Highlights",
         paragraphs: [],
         list: [
-          "NeoBERT fine-tuned with LoRA on Q and V projections",
-          "About 97% reduction in trainable parameters",
-          "Log-scaled targets to stabilize learning against price variance",
-          "SMAPE loss for symmetric, scale-aware error penalization",
-          "Achieved 41.6 SMAPE on the validation set",
-          "Mixed-precision training, AdamW optimizer, and gradient clipping",
+          "NeoBERT with an MLP regression head, trained on 75,000 Amazon products",
+          "Log-scaled targets and a custom SMAPE loss that matches the challenge metric",
+          "Multimodal variant: frozen CLIP ViT-B/32 image features fused through 8-head cross-attention",
+          "Mixed precision, warmup, gradient clipping and early stopping",
+          "MLflow experiment tracking and a four-method ensembling script",
         ],
       },
       {
         title: "Outcome",
         paragraphs: [
-          "The model produced a competitive validation score and showed that lightweight fine-tuning with careful loss design can handle noisy marketplace pricing data effectively.",
+          "The result is a working text-only pricing model and a complete, tracked pipeline around it, from data loading through MLflow-logged experiments to ensembled predictions, with a multimodal variant ready to compare against it.",
         ],
       },
     ],
@@ -372,7 +372,7 @@ export const projects: Project[] = [
     author: "Divyam Sharma",
     date: "August 2025",
     role: "Full-Stack Engineer",
-    techStack: ["Django", "DRF", "Gemini API", "SQLite", "JWT", "Python"],
+    techStack: ["Django", "DRF", "Gemini API", "PostgreSQL", "JWT", "Python"],
     sections: [
       {
         title: "Overview",

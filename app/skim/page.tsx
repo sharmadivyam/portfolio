@@ -14,7 +14,11 @@ function Entry({ item }: { item: Item }) {
   return (
     <article className="border-t border-cream/12 py-6">
       <h3 className="font-display text-[21px] font-bold leading-snug text-cream">{item.title ?? item.name}</h3>
-      {meta.length ? <p className="mt-1 font-terminal text-[12.5px] leading-[1.7] text-cream-muted">{meta.join("   ")}</p> : null}
+      {meta.length ? (
+        <p className="mt-1 flex flex-wrap gap-x-5 font-terminal text-[12.5px] leading-[1.7] text-cream-muted">
+          {meta.map((m) => <span key={m}>{m}</span>)}
+        </p>
+      ) : null}
       {item.bullets ? (
         <ul className="mt-3 list-disc space-y-1.5 pl-[18px] font-display text-[16.5px] leading-[1.55] text-cream marker:text-cream-faint">
           {item.bullets.map((b) => <li key={b}>{b}</li>)}
