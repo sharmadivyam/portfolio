@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Afacad, Inter, Martian_Mono, Playfair_Display } from "next/font/google";
+import { NavTracker } from "@/components/back-to-map";
 import "./globals.css";
 
 const inter = Inter({
@@ -41,7 +42,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${playfairDisplay.variable} ${afacad.variable} ${martianMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <NavTracker />
+        {children}
+      </body>
     </html>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getItem, itemsIn, profile, shortName, worldPath, worlds, type Item } from "@/data/portfolio";
+import { onFirstPage, PLACE_KEY } from "@/components/back-to-map";
 import { LatentSpaceEngine, SKY, type EngineState, type SafeArea } from "./engine";
 import { search as searchMap, type Hit } from "./search";
 
@@ -33,6 +34,10 @@ function readHint(): HintStep {
     return "world";
   }
 }
+
+// Set once the map has been shown in this tab. Coming back to it later, or arriving from another page of the site
+// (Back, or a link home), restores the place in the address instead of replaying the landing; a reload starts over.
+let mapShown = false;
 
 const nextHint = (step: HintStep, s: EngineState): HintStep =>
   step !== "done" && s.selectedId ? "done" : step === "world" && s.active !== null ? "place" : step;
@@ -101,7 +106,12 @@ export function LatentSpace() {
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const [state, setState] = useState<EngineState>(INITIAL);
-  const [intro, setIntro] = useState(true);
+  const [fresh] = useState(() => !mapShown && onFirstPage());
+  const [intro, setIntro] = useState(fresh);
+  const introRef = useRef(intro);
+  // When the visitor last asked to move (a click, a key, a card): those moves become steps in the browser's history.
+  const navAt = useRef(0);
+  const intend = () => { navAt.current = performance.now(); };
   const [gather, setGather] = useState(0);          // Big Bang: scroll progress towards the bang
   const [banged, setBanged] = useState(false);
   const gatherRef = useRef(0);
@@ -203,26 +213,30 @@ export function LatentSpace() {
         }
       },
       // Any press on the map pauses a running tour.
-      onPress: () => setTour((t) => (t ? { ...t, paused: true } : t)),
+      onPress: (p) => {
+        setTour((t) => (t ? { ...t, paused: true } : t));
+        if (p && p.kind !== "skill") intend();
+      },
       onGenesisDone: () => setIntro(false),
     });
     engineRef.current = engine;
     engine.start();
 
-    // Every visit and every refresh starts with the Big Bang, except a shared link opened fresh
-    // (#world=junction, #item=gateway, #tour), which opens straight onto the map; the page's inline script
-    // makes the same call before first paint.
-    const shared = "deeplink" in document.documentElement.dataset;
-    if (!shared && window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    const params = new URLSearchParams(shared ? window.location.hash.slice(1) : "");
+    // A fresh visit or a reload starts with the Big Bang, except a shared link (#world=junction, #item=gateway,
+    // #tour, #map), which opens straight onto the map; the page's inline script makes the same call before first
+    // paint. Coming back within the tab skips the landing and restores the place in the address.
+    const restoring = !fresh || "deeplink" in document.documentElement.dataset;
+    mapShown = true;
+    if (!restoring && window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    const params = new URLSearchParams(restoring ? window.location.hash.slice(1) : "");
     const item = params.get("item"), world = worlds.findIndex((w) => w.key === params.get("world"));
-    const deepLink = Boolean(item && getItem(item)) || world >= 0 || params.has("tour");
     if (item && getItem(item)) engine.openItem(item, true);
     else if (world >= 0) engine.enterWorld(world, true);
-    else if (!deepLink) engine.setGenesis(true);
+    else if (!restoring) engine.setGenesis(true);
     const frame = requestAnimationFrame(() => {
+      try { sessionStorage.setItem(PLACE_KEY, window.location.hash || "#map"); } catch { /* storage blocked: "Back to the map" opens the overview */ }
       setHint(hintRef.current);
-      if (deepLink) setIntro(false);
+      if (restoring) setIntro(false);
       if (params.has("tour")) setTour({ step: 0, paused: false });
     });
 
@@ -231,7 +245,7 @@ export function LatentSpace() {
       engine.destroy();
       engineRef.current = null;
     };
-  }, []);
+  }, [fresh]);
 
   // On the landing, scrolling (or swiping up) gathers the star; past the end it bangs and plays out on its own.
   // Enter, Space, a click or the "begin" button set it off straight away.
@@ -272,13 +286,43 @@ export function LatentSpace() {
     };
   }, [intro, banged, enterMap, playBang]);
 
-  // Keep the address bar in sync, so any world or card can be linked to.
+  // Keep the address in sync, so any world or card can be linked to. A move the visitor asked for is a new step in
+  // the browser's history, so Back retraces it (a card back to its world, a world back to wherever they were);
+  // moves made by the tour, by Back itself, or along the way (closing a card on the way out) replace instead.
   useEffect(() => {
     if (!readyRef.current) return;
     const key = state.active !== null ? worlds[state.active].key : null;
-    const hash = key ? `#world=${key}${state.selectedId ? `&item=${state.selectedId}` : ""}` : "";
-    window.history.replaceState(null, "", hash || window.location.pathname + window.location.search);
-  }, [state.active, state.selectedId]);
+    const hash = key ? `#world=${key}${state.selectedId ? `&item=${state.selectedId}` : ""}` : "#map";
+    if (window.location.hash !== hash && !(hash === "#map" && !window.location.hash)) {
+      const asked = performance.now() - navAt.current < 2500 && !tour;
+      navAt.current = 0;
+      if (asked) window.history.pushState(null, "", hash);
+      else window.history.replaceState(null, "", hash);
+    }
+    // Remembered for "Back to the map" on the other pages.
+    try { sessionStorage.setItem(PLACE_KEY, hash); } catch { /* storage blocked: "Back to the map" opens the overview */ }
+  }, [state.active, state.selectedId, tour]);
+
+  // Back and Forward: take the map to the place in the address.
+  useEffect(() => {
+    introRef.current = intro;
+  }, [intro]);
+  useEffect(() => {
+    const onPop = () => {
+      const engine = engineRef.current;
+      if (!engine || introRef.current) return;
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const item = params.get("item"), world = worlds.findIndex((w) => w.key === params.get("world"));
+      setTour(null);
+      setGuideOpen(false);
+      if (item && getItem(item)) engine.openItem(item);
+      else if (world >= 0 && stateRef.current.active === world) engine.clearSelection();
+      else if (world >= 0) engine.enterWorld(world);
+      else engine.exitToSpace();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Back in open space, re-fit the overview to the current screen.
   useEffect(() => {
@@ -324,11 +368,11 @@ export function LatentSpace() {
       if (e.key === "Escape") {
         if (guideOpen) closeGuide();
         else if (tour) endTour();
-        else if (stateRef.current.selectedId) engine.clearSelection();
-        else engine.exitToSpace();
-      } else if (e.key === "ArrowRight") engine.hop(1);
-      else if (e.key === "ArrowLeft") engine.hop(-1);
-      else if (/^[0-6]$/.test(e.key)) engine.enterWorld(Number(e.key));
+        else if (stateRef.current.selectedId) { intend(); engine.clearSelection(); }
+        else { intend(); engine.exitToSpace(); }
+      } else if (e.key === "ArrowRight") { intend(); engine.hop(1); }
+      else if (e.key === "ArrowLeft") { intend(); engine.hop(-1); }
+      else if (/^[0-6]$/.test(e.key)) { intend(); engine.enterWorld(Number(e.key)); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -363,13 +407,14 @@ export function LatentSpace() {
 
   const openItem = (id: string) => {
     setTour((t) => (t ? { ...t, paused: true } : t));
+    intend();
     engineRef.current?.openItem(id);
   };
   // A world flies there, a place opens its card, a skill opens the world where it was used.
   const openResult = (hit: Hit) => {
     setTour(null);
     if (hit.kind === "item") openItem(hit.item.id);
-    else engineRef.current?.enterWorld(hit.kind === "world" ? hit.index : worlds.findIndex((w) => w.key === hit.skill.world));
+    else { intend(); engineRef.current?.enterWorld(hit.kind === "world" ? hit.index : worlds.findIndex((w) => w.key === hit.skill.world)); }
     setQuery("");
   };
 
@@ -538,7 +583,7 @@ export function LatentSpace() {
               <button
                 key={w.key}
                 type="button"
-                onClick={() => { setTour(null); engineRef.current?.enterWorld(i); }}
+                onClick={() => { setTour(null); intend(); engineRef.current?.enterWorld(i); }}
                 aria-current={state.active === i ? "true" : undefined}
                 className={`flex shrink-0 items-center gap-2 rounded-full border-2 px-3.5 py-2 font-display text-[15.5px] font-semibold transition ${
                   state.active === i ? "border-cream bg-cream text-night" : "border-cream/30 bg-night-card text-cream hover:border-cream"
@@ -588,7 +633,7 @@ export function LatentSpace() {
                     type="button"
                     data-chip={item.id}
                     aria-pressed={item.id === state.selectedId}
-                    onClick={() => (item.id === state.selectedId ? engineRef.current?.clearSelection() : openItem(item.id))}
+                    onClick={() => (item.id === state.selectedId ? (intend(), engineRef.current?.clearSelection()) : openItem(item.id))}
                     className={`flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 font-display text-[14px] font-semibold transition ${
                       item.id === state.selectedId ? "border-cream bg-cream text-night" : "border-cream/30 text-cream"
                     }`}
@@ -601,7 +646,7 @@ export function LatentSpace() {
             </div>
             <div className={`min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-[18px] max-md:px-4 max-md:pb-4 max-md:pt-3 ${selected ? "" : "max-md:hidden"}`}>
               {selected ? (
-                <ItemCard item={selected} worldName={world.name} onBack={() => engineRef.current?.clearSelection()} />
+                <ItemCard item={selected} worldName={world.name} onBack={() => { intend(); engineRef.current?.clearSelection(); }} />
               ) : (
                 <>
                   <p className="font-terminal text-xs text-kiwi">{worldPath(state.active ?? 0)}</p>
@@ -624,8 +669,8 @@ export function LatentSpace() {
               )}
             </div>
             <div className="flex gap-2 border-t border-cream/15 p-3 max-md:mt-3 max-md:p-2.5">
-              <button type="button" onClick={() => (touring ? endTour() : engineRef.current?.exitToSpace())} className={`${smallButton} flex-1`}>← Map</button>
-              <button type="button" onClick={() => { setTour(null); engineRef.current?.hop(1); }} className={`${smallButton} flex-1`}>Next world →</button>
+              <button type="button" onClick={() => (touring ? endTour() : (intend(), engineRef.current?.exitToSpace()))} className={`${smallButton} flex-1`}>← Map</button>
+              <button type="button" onClick={() => { setTour(null); intend(); engineRef.current?.hop(1); }} className={`${smallButton} flex-1`}>Next world →</button>
             </div>
           </>
         ) : null}

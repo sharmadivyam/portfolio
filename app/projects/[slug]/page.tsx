@@ -45,7 +45,7 @@ export default async function StoryPage({ params }: Props) {
           <div className="flex gap-2.5">
             <Link href="/skim" className={barLink}>Skim</Link>
             <Link href="/contact" className={barLink}>Contact</Link>
-            <Link href={back} className={barLink}>← Back to the map</Link>
+            <Link href={back} replace className={barLink}>← Back to the map</Link>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ export default async function StoryPage({ params }: Props) {
         </div>
 
         <footer className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-cream/12 pt-8">
-          <Link href={back} className={textLink}>← Back to the map</Link>
+          <Link href={back} replace className={textLink}>← Back to the map</Link>
           {next && next.slug !== slug ? (
             <Link href={`/projects/${next.slug}`} className="text-right">
               <span className="block font-terminal text-[12px] text-cream-muted">next story</span>

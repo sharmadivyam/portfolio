@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { BackToMap } from "@/components/back-to-map";
 import { ContactForm } from "@/components/contact-form";
 import { profile } from "@/data/portfolio";
 
@@ -19,9 +19,9 @@ export default function ContactPage() {
           <p className="font-terminal text-[13px] text-cream-muted">
             <b className="font-medium text-kiwi">~/divyam/contact</b>&nbsp;&nbsp;straight to my inbox
           </p>
-          <Link href="/" className="rounded-xl border-2 border-cream/30 px-4 py-2 font-display text-[15px] font-semibold transition hover:border-cream">
+          <BackToMap className="rounded-xl border-2 border-cream/30 px-4 py-2 font-display text-[15px] font-semibold transition hover:border-cream">
             ← Back to the map
-          </Link>
+          </BackToMap>
         </div>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">

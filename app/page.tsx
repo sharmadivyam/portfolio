@@ -4,7 +4,7 @@ import { LatentSpace } from "@/components/latent-space/latent-space";
 // A refresh always starts with the Big Bang; a shared link opened fresh goes straight to its world or card.
 const DEEP_LINK_SCRIPT =
   "var n = performance.getEntriesByType('navigation')[0];" +
-  "if (!(n && n.type === 'reload') && /[#&](world|item)=|[#&]tour(&|$)/.test(location.hash)) document.documentElement.dataset.deeplink = '';";
+  "if (!(n && n.type === 'reload') && /[#&](world|item)=|[#&](tour|map)(&|$)/.test(location.hash)) document.documentElement.dataset.deeplink = '';";
 
 export default function Home() {
   return (

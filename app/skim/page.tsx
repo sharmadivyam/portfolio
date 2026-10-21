@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BackToMap } from "@/components/back-to-map";
 import { getItem, highlights, profile, skillGroups, skimGroups, type Item } from "@/data/portfolio";
 
 export const metadata: Metadata = {
@@ -51,9 +52,9 @@ export default function SkimPage() {
           <p className="font-terminal text-[13px] text-cream-muted">
             <b className="font-medium text-kiwi">~/divyam/skim</b>&nbsp;&nbsp;everything on one page
           </p>
-          <Link href="/" className="rounded-xl border-2 border-cream/30 px-4 py-2 font-display text-[15px] font-semibold transition hover:border-cream">
+          <BackToMap className="rounded-xl border-2 border-cream/30 px-4 py-2 font-display text-[15px] font-semibold transition hover:border-cream">
             ← Back to the map
-          </Link>
+          </BackToMap>
         </div>
 
         <h1 className="mt-10 font-display text-[52px] font-bold uppercase leading-[0.9] sm:text-[72px]">{profile.name}</h1>
