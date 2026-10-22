@@ -50,7 +50,7 @@ const S = 0.5;
 /** Extra ground around each scene's 10×10 layout grid: islands run from -PAD to 10 + PAD. */
 export const PAD = 1;
 
-// What Relay does to each request, cycling on the Junction's routing board.
+// What Relay does to each request, cycling on AI Junction's routing board.
 const ROUTES = ["semantic cache → hit", "simple → cheap model", "complex → premium model",
   "jailbreak → blocked", "pii → redacted", "429 → fallback model"];
 

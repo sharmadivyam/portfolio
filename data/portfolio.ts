@@ -60,7 +60,7 @@ export const worlds: World[] = [
     tour: "Models and research: a subliminal-learning replication on Qwen and Gemma, NeoBERT price prediction for the Amazon ML Challenge, and LexiGrade.",
   },
   {
-    key: "junction", name: "The Junction", label: "ai systems", color: "#6fd3c1", at: [0.82, -0.36],
+    key: "junction", name: "AI Junction", label: "ai systems", color: "#6fd3c1", at: [0.82, -0.36],
     description: "AI systems I've built: agents, RAG, search and infrastructure. Requests arrive, get routed, and leave with an answer.",
     tour: "AI systems I built: Relay, a self-hosted AI gateway; CiteScope, a citation finder that says when it can't answer; WHAT IF?, a five-agent RAG engine; and GroomMe, recommendations grounded in what you own.",
   },
@@ -158,7 +158,7 @@ export const items: Item[] = [
   { id: "chai", world: "lab", offset: [0.0, 0.12], object: "chai", kind: "fuel", name: "Chai",
     blurb: "Required for every training run.", tags: "chai" },
 
-  // The Junction
+  // AI Junction
   { id: "gateway", world: "junction", offset: [0.0, -0.02], object: "tower", kind: "project", status: "new", name: "Relay, my AI gateway", short: "Relay",
     blurb: "Drop-in AI gateway: auth, guardrails, semantic caching and cost-aware routing in front of 100+ LLM providers.",
     tags: "gateway infra llm routing backend agents relay cache guardrails",
