@@ -3,9 +3,12 @@ import { Afacad, Inter, Martian_Mono, Playfair_Display } from "next/font/google"
 import { NavTracker } from "@/components/back-to-map";
 import "./globals.css";
 
+// Inter and Playfair only appear on the older About and Work pages, so they aren't preloaded everywhere else;
+// they still load wherever they're actually used.
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter-sans",
+  preload: false,
 });
 
 const playfairDisplay = Playfair_Display({
@@ -13,6 +16,7 @@ const playfairDisplay = Playfair_Display({
   style: ["italic"],
   weight: ["400"],
   variable: "--font-playfair-display",
+  preload: false,
 });
 
 const afacad = Afacad({

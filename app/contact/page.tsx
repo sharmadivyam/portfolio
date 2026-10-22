@@ -13,7 +13,7 @@ const email = profile.links.email.replace("mailto:", "");
 
 export default function ContactPage() {
   return (
-    <main className="min-h-dvh bg-night text-cream">
+    <main className="min-h-dvh bg-night font-display text-cream">
       <div className="mx-auto w-full max-w-[1040px] px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-terminal text-[13px] text-cream-muted">

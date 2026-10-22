@@ -472,7 +472,7 @@ export function LatentSpace() {
   );
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden text-cream" style={{ background: SKY_CSS }}>
+    <div className="relative h-dvh w-full overflow-hidden font-display text-cream" style={{ background: SKY_CSS }}>
       <a href="/skim" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cream focus:px-4 focus:py-2 focus:font-display focus:text-night">
         Skip to the list version
       </a>

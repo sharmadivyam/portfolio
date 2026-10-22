@@ -46,7 +46,7 @@ function Entry({ item }: { item: Item }) {
 
 export default function SkimPage() {
   return (
-    <main className="min-h-dvh bg-night text-cream">
+    <main className="min-h-dvh bg-night font-display text-cream">
       <div className="mx-auto w-full max-w-[880px] px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-terminal text-[13px] text-cream-muted">

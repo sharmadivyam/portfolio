@@ -758,10 +758,19 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
     },
   };
 
+  // A world's parts depend only on the time, so each one is built once per frame (and sorted once, for drawing) and
+  // shared by draw, anchor and hit, which otherwise rebuilt it for every pin on every frame.
+  const built = new Map<WorldKey, { t: number; scene: Scene; sorted?: Part[] }>();
+  function sceneAt(key: WorldKey, t: number) {
+    let entry = built.get(key);
+    if (!entry || entry.t !== t) built.set(key, (entry = { t, scene: scenes[key](t) }));
+    return entry;
+  }
+
   return {
     /** Draw one world island. `depth` is how far the camera has dived into it (0–1). */
     draw(key: WorldKey, X: Frame, alpha: number, t: number, depth: number, color: string, hot: string | null) {
-      const sc = scenes[key](t);
+      const entry = sceneAt(key, t), sc = entry.scene;
       ctx.save();
       ctx.globalAlpha = alpha;
       const [gx, gy] = P(X, 5, 5, -1.5), R = X.u * (11 + PAD * 2);
@@ -774,7 +783,8 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
       box(X, { x: -PAD + inset, y: -PAD + inset, z: -2.7, w: size - inset * 2, d: size - inset * 2, h: 1.8, c: shade(sc.earth, 0.75) });
       box(X, { x: -PAD, y: -PAD, w: size, d: size, z: -1, h: 1, c: sc.earth, top: sc.ground });
       sc.floor?.(X);
-      for (const p of [...sc.parts].sort((a, b) => sortKey(a) - sortKey(b)))
+      entry.sorted ??= [...sc.parts].sort((a, b) => sortKey(a) - sortKey(b));
+      for (const p of entry.sorted)
         box(X, p, Boolean(hot && p.key === hot && depth > 0.85));
       sc.over?.(X);
       ctx.restore();
@@ -782,7 +792,7 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
 
     /** Screen point just above the object an item lives on. */
     anchor(key: WorldKey, X: Frame, object: string, t: number): Point | null {
-      const all = scenes[key](t).parts.filter((p) => p.key === object);
+      const all = sceneAt(key, t).scene.parts.filter((p) => p.key === object);
       const marked = all.filter((p) => p.anchor);
       const parts = marked.length ? marked : all;
       if (!parts.length) return null;
@@ -795,7 +805,7 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
     /** The front-most object under the pointer, if any. */
     hit(key: WorldKey, X: Frame, mx: number, my: number, t: number): string | null {
       let best: Part | null = null, bestK = -Infinity;
-      for (const p of scenes[key](t).parts) {
+      for (const p of sceneAt(key, t).scene.parts) {
         if (!p.key) continue;
         const f = faces(X, p), pts = [...f.top, ...f.left, ...f.right];
         const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);

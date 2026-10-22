@@ -132,6 +132,17 @@ export class LatentSpaceEngine {
   private now = performance.now();
   /** World labels fade in once the Big Bang has formed the worlds. */
   private labelFade = 0;
+  /** The sky gradient only changes with the canvas size, so it's built on resize. */
+  private skyFill: CanvasGradient | null = null;
+  /**
+   * Adaptive smoothness: how long drawing a frame takes (a moving average). On a device that keeps running long,
+   * frames where only ambient motion is happening (twinkles, bobbing islands, the van) are drawn at 30 fps; camera
+   * moves, the Big Bang, fades and anything the visitor does stay at 60. Devices that keep up never change.
+   */
+  private workMs = 0;
+  private slow = false;
+  private skipped = false;
+  private lastInput = -Infinity;
   private cam: Camera = { x: 0, y: 0, z: 1 };
   private tween: Tween | null = null;
   private active: number | null = null;
@@ -290,6 +301,8 @@ export class LatentSpaceEngine {
     this.canvas.width = Math.round(this.W * dpr);
     this.canvas.height = Math.round(this.H * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.skyFill = this.ctx.createRadialGradient(this.W * 0.42, this.H * 0.55, 0, this.W * 0.42, this.H * 0.55, Math.max(this.W, this.H) * 0.85);
+    for (const [stop, color] of SKY) this.skyFill.addColorStop(stop, color);
     this.refreshHome();
     if (this.active !== null && !this.tween) this.cam = this.worldCam(this.active, this.selected);
   }
@@ -438,6 +451,15 @@ export class LatentSpaceEngine {
   // ----- the loop -----
 
   private frame = (now: number) => {
+    const g0 = this.genesis;
+    const moving = this.tween !== null || (g0 !== null && !g0.done) || this.labelFade < 0.995 || now - this.lastInput < 800;
+    if (this.slow && !moving && !this.skipped) {
+      this.skipped = true;
+      this.raf = requestAnimationFrame(this.frame);
+      return;
+    }
+    this.skipped = false;
+    const workStart = performance.now();
     this.now = now;
     this.step(now);
     // rAF timestamps can trail the constructor's clock by a frame; scenes index colours by time, so never go negative.
@@ -457,6 +479,9 @@ export class LatentSpaceEngine {
     this.updateTooltip();
     this.updatePins();
     this.emit();
+    this.workMs = this.workMs * 0.9 + (performance.now() - workStart) * 0.1;
+    if (!this.slow && this.workMs > 12) this.slow = true;
+    else if (this.slow && this.workMs < 7) this.slow = false;
     this.raf = requestAnimationFrame(this.frame);
   };
 
@@ -481,9 +506,7 @@ export class LatentSpaceEngine {
     // while hopping, the world we just left fades out instead of vanishing
     const lf = this.tween && this.leaving !== null ? clamp(1 - this.tween.k * 2.2) : 0;
 
-    const sky = ctx.createRadialGradient(W * 0.42, H * 0.55, 0, W * 0.42, H * 0.55, Math.max(W, H) * 0.85);
-    for (const [stop, color] of SKY) sky.addColorStop(stop, color);
-    ctx.fillStyle = sky;
+    ctx.fillStyle = this.skyFill ?? "#060d24";
     ctx.fillRect(0, 0, W, H);
 
     this.drawStars();
@@ -794,6 +817,7 @@ export class LatentSpaceEngine {
   }
 
   private onPointerMove = (e: PointerEvent) => {
+    this.lastInput = performance.now();
     if (e.pointerType === "touch") return;           // no hover on touch screens: a tap opens the card instead
     const r = this.canvas.getBoundingClientRect();
     this.mouse.x = e.clientX - r.left;
@@ -805,6 +829,7 @@ export class LatentSpaceEngine {
   };
 
   private onPointerDown = (e: PointerEvent) => {
+    this.lastInput = performance.now();
     const r = this.canvas.getBoundingClientRect();
     const h = this.tween ? null : this.pick(e.clientX - r.left, e.clientY - r.top);
     this.pinned = null;

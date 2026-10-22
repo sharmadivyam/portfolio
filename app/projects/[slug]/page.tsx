@@ -36,7 +36,7 @@ export default async function StoryPage({ params }: Props) {
   const next = order.length ? getProjectBySlug(order[(order.indexOf(slug) + 1) % order.length]) : undefined;
 
   return (
-    <main className="min-h-dvh bg-night text-cream">
+    <main className="min-h-dvh bg-night font-display text-cream">
       <div className="mx-auto w-full max-w-[880px] px-4 pb-24 pt-8 sm:px-6 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="min-w-0 truncate font-terminal text-[13px] text-cream-muted">
