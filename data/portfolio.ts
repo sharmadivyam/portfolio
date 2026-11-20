@@ -72,7 +72,7 @@ export const worlds: World[] = [
   {
     key: "experience", name: "Experience", label: "where I've worked", color: "#f08a6b", at: [0.82, 0.42],
     description: "Where I've worked: from building a startup's core AI product to product work at Paytm.",
-    tour: "Where I've worked: at Savra I was the only engineer on the AI that writes CBSE exam papers; at Paytm I built a partner portal and the dashboard leadership uses; product at Stotio; backend APIs at VVDN. ZS Associates is next.",
+    tour: "Where I've worked: at Savra I was the only engineer on the AI that writes CBSE exam papers; at Paytm I built a partner portal and the dashboard leadership uses; product at Stotio; backend APIs at VVDN.",
   },
   {
     key: "off-duty", name: "Off Duty", label: "hobbies", color: "#7fb8ff", at: [0, 0.74],
@@ -80,6 +80,17 @@ export const worlds: World[] = [
     tour: "Off duty: singing, dancing, cooking, movies (Friends on repeat), poker nights, badminton and cricket.",
   },
 ];
+
+/**
+ * ZS Associates (BTSA intern) stays off the site until the internship starts in January 2027. Set this to true to
+ * publish it: its card, its building in the Experience world, and its entry on /skim.
+ */
+export const SHOW_ZS = false;
+
+const zs: Item = { id: "zs", world: "experience", offset: [0.03, 0.1], object: "zs", kind: "role", status: "upcoming", name: "ZS Associates",
+  blurb: "Joining ZS Associates as a BTSA intern.", tags: "consulting upcoming zs btsa",
+  title: "BTSA Intern at ZS Associates",
+  bullets: ["Joining ZS Associates as a BTSA intern; details to follow after the start date."] };
 
 export const items: Item[] = [
   // Origin
@@ -276,10 +287,7 @@ export const items: Item[] = [
       "Designed the database so new features could be added without breaking existing data.",
     ],
     stack: ["Python", "Django", "Django REST Framework", "SimpleJWT"] },
-  { id: "zs", world: "experience", offset: [0.03, 0.1], object: "zs", kind: "role", status: "upcoming", name: "ZS Associates",
-    blurb: "Joining ZS Associates as a BTSE intern. Opening soon.", tags: "consulting upcoming zs btse",
-    title: "BTSE Intern at ZS Associates",
-    bullets: ["Joining ZS Associates as a BTSE intern; details to follow after the start date."] },
+  ...(SHOW_ZS ? [zs] : []),
 
   // Off Duty
   { id: "sing", world: "off-duty", offset: [-0.02, 0.02], object: "mic", kind: "hobby", name: "Singing",
@@ -351,8 +359,6 @@ export const profile = {
   pitch: "AI engineer who takes LLM products from prototype to launch. I built Savra's AI exam-paper system as its only engineer, and did product work at Paytm.",
   /** The landing page: light, and about me rather than a list of everything. */
   intro: "AI engineer and product enthusiast. I like building AI that holds up outside a notebook, and I'm growing into product along the way.",
-  recently: "savra, paytm",
-  next: "zs associates",
   links: {
     resume: "https://drive.google.com/file/d/1E0QOTR2uLefoy9IRS6BD_riyYTdBYibd/view?usp=sharing",
     github: "https://github.com/sharmadivyam",

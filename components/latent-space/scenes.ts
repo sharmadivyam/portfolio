@@ -1,4 +1,4 @@
-import type { WorldKey } from "@/data/portfolio";
+import { SHOW_ZS, type WorldKey } from "@/data/portfolio";
 
 // Tiny isometric dioramas, drawn in code. Each world is a 10×10 island; parts are boxes on it.
 
@@ -592,12 +592,14 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
         ...[0, 1, 2, 3].map((k): Part => ({ key: "vvdn", x: -0.05, y: 8.54, z: 0.35 + k * 0.2, w: 0.8, d: 0.03, h: 0.06, c: led(k), left: led(k) })),
         { key: "vvdn", x: 1.0, y: 8.5, z: 0.5, w: 0.6, d: 0.04, h: 0.6, c: "#7aa6c9", left: "#7aa6c9" },
 
-        // ZS Associates: under construction
-        { key: "zs", x: 3.4, y: 6.8, w: 3.0, d: 2.4, h: 0.18, c: "#9c8f7c" },
-        { key: "zs", x: 3.4, y: 6.8, z: 1.3, w: 3.0, d: 2.4, h: 0.06, c: "#c9a27e" },
-        { key: "zs", x: 3.4, y: 6.8, z: 0.18, w: 3.0, d: 2.4, h: 2.4, c: "rgba(245,241,236,0.75)", wire: true },
-        { key: "zs", x: 3.6, y: 9.2, z: 1.5, w: 2.6, d: 0.06, h: 0.8, c: "#f5f1ec", left: "#f5f1ec", anchor: true },
-        { key: "zs", x: 6.6, y: 8.3, w: 1.2, d: 0.12, h: 0.7, c: "#f6c85f", left: "#f6c85f" },
+        // ZS Associates: under construction (hidden until SHOW_ZS in data/portfolio.ts)
+        ...(SHOW_ZS ? [
+          { key: "zs", x: 3.4, y: 6.8, w: 3.0, d: 2.4, h: 0.18, c: "#9c8f7c" },
+          { key: "zs", x: 3.4, y: 6.8, z: 1.3, w: 3.0, d: 2.4, h: 0.06, c: "#c9a27e" },
+          { key: "zs", x: 3.4, y: 6.8, z: 0.18, w: 3.0, d: 2.4, h: 2.4, c: "rgba(245,241,236,0.75)", wire: true },
+          { key: "zs", x: 3.6, y: 9.2, z: 1.5, w: 2.6, d: 0.06, h: 0.8, c: "#f5f1ec", left: "#f5f1ec", anchor: true },
+          { key: "zs", x: 6.6, y: 8.3, w: 1.2, d: 0.12, h: 0.7, c: "#f6c85f", left: "#f6c85f" },
+        ] satisfies Part[] : []),
 
         // A chai cart and a tree, for the street
         { x: 8.0, y: 7.3, w: 1.4, d: 0.7, h: 0.85, c: "#d9773a" },
@@ -620,9 +622,9 @@ export function createScenes(ctx: CanvasRenderingContext2D, fonts: Fonts) {
           paint(X, "left", 3.4, 1.94, 3.45, 2.8, 0.95, "SAVRA", { color: "#f3e8cc", size: 0.62 });
           paint(X, "left", 3.15, 3.64, 1.3, 1.5, 0.85, ["10× cheaper", "23% → 0%"], { color: "rgba(245,241,236,0.92)", size: 0.24, weight: 600 });
           paint(X, "right", 1.8, 8.4, 1.4, 1.8, 0.45, "VVDN", { color: "#1f4e8c", size: 0.32 });
-          paint(X, "left", 3.6, 9.26, 2.3, 2.6, 0.8, ["ZS ASSOCIATES", "OPENING SOON"], { color: "#1b1f2e", size: 0.22 });
+          if (SHOW_ZS) paint(X, "left", 3.6, 9.26, 2.3, 2.6, 0.8, ["ZS ASSOCIATES", "OPENING SOON"], { color: "#1b1f2e", size: 0.22 });
           paint(X, "left", 8.0, 8.0, 0.75, 1.4, 0.5, "CHAI", { color: "#fff4e0", size: 0.3 });
-          label(X, "SOON", 7.2, 8.43, 0.3, "#3a2a20", 0.32, 600);
+          if (SHOW_ZS) label(X, "SOON", 7.2, 8.43, 0.3, "#3a2a20", 0.32, 600);
           // question papers drifting from Savra's door to the desk
           for (let k = 0; k < 3; k++) {
             const p = (t * 0.35 + k / 3) % 1;
