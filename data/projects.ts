@@ -78,12 +78,12 @@ export const projects: Project[] = [
   },
 {
   slug: "what-if-counterfactual-history-engine",
-  title: "WHAT IF? A Counterfactual History Engine",
+  title: "WHAT IF? An Engine That Keeps an AI's Facts and Guesses Apart",
   description:
     "A multi-agent RAG pipeline that answers historical 'what if' questions with grounded, cited, confidence-scored reasoning. Verified facts and simulated consequences are always kept separate.",
   image: "/what-if.png",
   author: "Divyam Sharma",
-  date: "January 2026",
+  date: "May 2026",
   role: "AI/ML Engineer",
   techStack: [
     "Python",
@@ -415,7 +415,7 @@ export const projects: Project[] = [
   },
   {
     slug: "relay-ai-gateway",
-    title: "Relay: A Self-Hosted AI Gateway",
+    title: "Relay: An Enterprise AI Gateway",
     description:
       "One OpenAI-compatible endpoint in front of 100+ LLM providers, with authentication, guardrails in both directions, a semantic cache, cost-aware routing and a live dashboard.",
     author: "Divyam Sharma",
