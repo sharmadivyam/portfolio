@@ -127,6 +127,11 @@ export class LatentSpaceEngine {
   private particles: Particle[] = [];
   /** Constellations placed in the empty sky around the overview (screen pixels, longer side `size`). */
   private sky: { c: Constellation; x: number; y: number; size: number }[] = [];
+  /**
+   * Dragging inside a world pans the camera (a finger on phones, the mouse elsewhere). A press that moves less
+   * than a few pixels is a tap or click instead, handled when it lifts.
+   */
+  private drag: { id: number; x: number; y: number; cam: Camera; moved: boolean } | null = null;
   /** Touch has no hover, so a tapped skill keeps its card open beside it until the next tap. */
   private pinned: MapNode | null = null;
   private now = performance.now();
@@ -166,6 +171,8 @@ export class LatentSpaceEngine {
     canvas.addEventListener("pointermove", this.onPointerMove);
     canvas.addEventListener("pointerleave", this.onPointerLeave);
     canvas.addEventListener("pointerdown", this.onPointerDown);
+    canvas.addEventListener("pointerup", this.onPointerUp);
+    canvas.addEventListener("pointercancel", this.onPointerCancel);
   }
 
   start() {
@@ -181,6 +188,8 @@ export class LatentSpaceEngine {
     this.canvas.removeEventListener("pointermove", this.onPointerMove);
     this.canvas.removeEventListener("pointerleave", this.onPointerLeave);
     this.canvas.removeEventListener("pointerdown", this.onPointerDown);
+    this.canvas.removeEventListener("pointerup", this.onPointerUp);
+    this.canvas.removeEventListener("pointercancel", this.onPointerCancel);
   }
 
   // ----- public controls -----
@@ -473,9 +482,9 @@ export class LatentSpaceEngine {
     const forming = Boolean(g && !g.done);
     const fadeTo = forming ? 0 : 1;
     this.labelFade = this.opts.reducedMotion ? fadeTo : this.labelFade + (fadeTo - this.labelFade) * 0.06;
-    this.hover = this.tween || forming ? null : this.pick(this.mouse.x, this.mouse.y);
+    this.hover = this.tween || forming || this.drag?.moved ? null : this.pick(this.mouse.x, this.mouse.y);
     this.draw();
-    this.canvas.style.cursor = this.hover ? "pointer" : "default";
+    this.canvas.style.cursor = this.drag?.moved ? "grabbing" : this.hover ? "pointer" : this.canPan() ? "grab" : "default";
     this.updateTooltip();
     this.updatePins();
     this.emit();
@@ -818,6 +827,7 @@ export class LatentSpaceEngine {
 
   private onPointerMove = (e: PointerEvent) => {
     this.lastInput = performance.now();
+    this.panTo(e);
     if (e.pointerType === "touch") return;           // no hover on touch screens: a tap opens the card instead
     const r = this.canvas.getBoundingClientRect();
     this.mouse.x = e.clientX - r.left;
@@ -828,8 +838,45 @@ export class LatentSpaceEngine {
     this.mouse.x = this.mouse.y = -999;
   };
 
+  /** Panning is for a world you're standing in, once the camera has stopped moving. */
+  private canPan() {
+    return this.active !== null && !this.tween && this.depth() > 0.9;
+  }
+
   private onPointerDown = (e: PointerEvent) => {
     this.lastInput = performance.now();
+    this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, cam: { ...this.cam }, moved: false };
+    this.canvas.setPointerCapture?.(e.pointerId);
+  };
+
+  private onPointerCancel = () => {
+    this.drag = null;
+  };
+
+  private onPointerUp = (e: PointerEvent) => {
+    const d = this.drag;
+    this.drag = null;
+    if (!d || d.id !== e.pointerId || d.moved) return;
+    this.press(e);
+  };
+
+  /** Pan the camera with a drag, keeping the island on screen (it can move about a world's width either way). */
+  private panTo(e: PointerEvent) {
+    const d = this.drag;
+    if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.moved) {
+      if (Math.hypot(dx, dy) < 8 || !this.canPan()) return;
+      d.moved = true;
+      this.pinned = null;
+    }
+    const s = this.base() * this.cam.z, home = this.worldCam(this.active!, this.selected), reach = 0.2;
+    this.cam.x = clamp(d.cam.x - dx / s, home.x - reach, home.x + reach);
+    this.cam.y = clamp(d.cam.y - dy / s, home.y - reach, home.y + reach);
+  }
+
+  /** A tap or click: open what's under it. */
+  private press(e: PointerEvent) {
     const r = this.canvas.getBoundingClientRect();
     const h = this.tween ? null : this.pick(e.clientX - r.left, e.clientY - r.top);
     this.pinned = null;
@@ -844,7 +891,7 @@ export class LatentSpaceEngine {
       this.opts.onPress({ kind: "item", id: h.node.id });
       this.openItem(h.node.id);
     }
-  };
+  }
 
   private updateTooltip() {
     const tip = this.opts.tooltip;

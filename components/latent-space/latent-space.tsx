@@ -476,7 +476,7 @@ export function LatentSpace() {
       <a href="/skim" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cream focus:px-4 focus:py-2 focus:font-display focus:text-night">
         Skip to the list version
       </a>
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-manipulation" aria-label="A map of Divyam's work: seven worlds you can step into" role="img" />
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-none" aria-label="A map of Divyam's work: seven worlds you can step into" role="img" />
 
       <div ref={pinsRef} className="pointer-events-none absolute inset-0 z-10" style={{ visibility: "hidden" }}>
         {state.pinsVisible && world
