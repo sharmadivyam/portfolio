@@ -23,7 +23,7 @@ const linkGroups = [
     items: [
       {
         label: "My Resume",
-        href: "https://drive.google.com/file/d/1E0QOTR2uLefoy9IRS6BD_riyYTdBYibd/view?usp=sharing",
+        href: "https://drive.google.com/file/d/1V1mw7JpckDjE6ILmmL06v8d5sDG2Dr0L/view?usp=sharing",
         icon: UserRound,
       },
       { label: "Email Me", href: "mailto:sharmadivyam86@gmail.com", icon: Mail },

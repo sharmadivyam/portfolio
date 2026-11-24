@@ -258,14 +258,14 @@ export const items: Item[] = [
     stack: ["SQL", "Apache Superset", "Trino", "Funnel analysis", "Event tracking", "Jira"] },
   { id: "savra", world: "experience", offset: [0.0, -0.09], object: "savra", kind: "role", status: "shipped", name: "Savra", short: "Savra",
     blurb: "As the only engineer on Savra's core AI product, I built the system that writes full CBSE exam papers, with answer keys, from NCERT textbooks.",
-    tags: "fde forward deployed ai startup education llm rag evaluation qdrant redis exam papers cbse",
+    tags: "fde forward deployed ai startup education llm rag evaluation qdrant redis exam papers cbse teachers",
     title: "Forward Deployed AI Intern at Savra", context: "AI startup in education", when: "Aug – Nov 2026",
     bullets: [
-      "Took Savra's AI exam-paper product from a prototype that had never reached a teacher to a launch covering 33 subjects across grades 6–12, in English and Hindi, including 1,300+ diagram questions.",
-      "Tested four approaches blind before committing. The result overturned the design I inherited and cancelled a sprint that wouldn't have helped; papers became 10× cheaper to make, and shallow questions fell from 23% to 0%.",
-      "Built the checks every paper goes through: an AI grader tested against real CBSE board questions, and an answer-key checker that re-solves each question and fixes what's wrong.",
-      "Turned 476 textbook PDFs into 26,000+ clean, searchable passages, found and fixed a hidden defect that was corrupting 12.8% of them, and cached each chapter's key facts so no paper starts from scratch.",
-      "Rolled it out to selected teachers first, over 7 staged releases, with an automatic switch back to the old system if anything failed. Alongside, shipped ~100 changes to the live app, from a credits system to offers that won back lapsed teachers.",
+      "Took Savra's AI exam-paper product from an early prototype to launch, covering 33 subjects across grades 6–12 in English and Hindi, including 1,300+ diagram questions.",
+      "Tested four approaches blind before committing to one, so the design was chosen on evidence. Papers became 10× cheaper to make, and shallow, recall-only questions fell from 23% to 0%.",
+      "Built quality checks so every paper and its answer key is reviewed before it reaches a teacher.",
+      "Rolled it out to selected teachers first, over 7 staged releases, before the full launch.",
+      "Alongside the AI work, shipped ~100 changes to the live app, from a credits system to offers that won back teachers who had stopped using it.",
     ],
     stack: ["Python", "FastAPI", "Gemini API", "Qdrant", "Redis", "PostgreSQL", "Node/Express", "Docker"] },
   { id: "stotio", world: "experience", offset: [0.11, -0.03], object: "stall2", kind: "role", name: "Stotio",
@@ -327,8 +327,8 @@ const SKILL_COLUMNS: { world: WorldKey; left: [name: string, note: string][]; ri
   },
   {
     world: "junction",
-    left: [["LangGraph", "Five AI agents that answer 'what if' history questions, with sources."], ["RAG", "A production system that writes school exam papers from textbooks, and a history engine."], ["Vector databases", "Searching 26,000+ textbook passages at work, and in two of my AI projects."], ["Information retrieval", "A citation finder built from scratch: indexing, ranking and search."]],
-    right: [["LLM evals", "Automated quality checks on AI-written exam questions, and test suites for my AI gateway."], ["FastAPI", "The backends of a production AI service and my AI gateway."], ["Redis", "Caching in a production AI service, and rate limits in my AI gateway."]],
+    left: [["LangGraph", "Five AI agents that answer 'what if' history questions, with sources."], ["RAG", "Grounding AI answers in real sources, in my 'what if' history engine."], ["Vector databases", "Semantic search in two of my AI projects."], ["Information retrieval", "A citation finder built from scratch: indexing, ranking and search."]],
+    right: [["LLM evals", "Automated quality checks on AI-written exam questions, and test suites for my AI gateway."], ["FastAPI", "The backends of a production AI service and my AI gateway."], ["Redis", "Rate limits in my AI gateway."]],
   },
   {
     world: "edge",
@@ -360,7 +360,7 @@ export const profile = {
   /** The landing page: light, and about me rather than a list of everything. */
   intro: "AI engineer and product enthusiast. I like building AI that holds up outside a notebook, and I'm growing into product along the way.",
   links: {
-    resume: "https://drive.google.com/file/d/1E0QOTR2uLefoy9IRS6BD_riyYTdBYibd/view?usp=sharing",
+    resume: "https://drive.google.com/file/d/1V1mw7JpckDjE6ILmmL06v8d5sDG2Dr0L/view?usp=sharing",
     github: "https://github.com/sharmadivyam",
     linkedin: "https://www.linkedin.com/in/divyam-sharma-4a8a562b0/",
     email: "mailto:sharmadivyam86@gmail.com",
